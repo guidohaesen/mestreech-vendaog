@@ -1,0 +1,1199 @@
+```html
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mestreech Vendaog</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        :root {
+            --red: #C8102E;
+            --dark-red: #8B0000;
+            --gold: #FFC72C;
+            --bg: #090d16;
+            --card: #131c2e;
+            --border: #1e2d4a;
+            --text: #f8fafc;
+            --sub: #94a3b8;
+            --loos-orange: #ff6b00;
+            --alert-red: #ef4444;
+        }
+
+        body {
+            background-color: #000000;
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background-color: var(--bg);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            box-shadow: 0 0 35px rgba(0,0,0,0.85);
+        }
+
+        /* Pop-up Melding (Toast) */
+        #toast {
+            position: fixed;
+            top: 14px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-220%);
+            width: calc(100% - 28px);
+            max-width: 440px;
+            background-color: #151f32;
+            border: 2px solid var(--red);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 99999;
+            box-shadow: 0 10px 25px rgba(200, 16, 46, 0.55);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        #toast.active {
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast-star {
+            width: 36px;
+            height: 36px;
+            background: var(--red);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #ffffff;
+            flex-shrink: 0;
+            font-weight: bold;
+        }
+
+        /* Header */
+        header {
+            position: sticky;
+            top: 0;
+            background-color: var(--bg);
+            z-index: 40;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 14px 8px;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Geanimeerde Maastrichtse Vlag */
+        .flag-container {
+            width: 48px;
+            height: 34px;
+            position: relative;
+            perspective: 350px;
+            flex-shrink: 0;
+        }
+
+        .flag-pole {
+            position: absolute;
+            left: -2px;
+            top: -2px;
+            width: 3px;
+            height: 38px;
+            background: linear-gradient(180deg, #e2e8f0 0%, #64748b 100%);
+            border-radius: 2px;
+            z-index: 2;
+        }
+
+        .flag-pole-knob {
+            position: absolute;
+            left: -3.5px;
+            top: -4px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--gold);
+            z-index: 3;
+            box-shadow: 0 0 4px var(--gold);
+        }
+
+        .flag-wave {
+            width: 100%;
+            height: 100%;
+            background-color: #d90429;
+            border-radius: 0 4px 4px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 2px 3px 8px rgba(0,0,0,0.5);
+            transform-origin: left center;
+            animation: flagWaving 3.2s ease-in-out infinite alternate;
+        }
+
+        .flag-wave::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                90deg, 
+                rgba(255,255,255,0.0) 0%, 
+                rgba(255,255,255,0.22) 28%, 
+                rgba(0,0,0,0.25) 55%, 
+                rgba(255,255,255,0.18) 78%, 
+                rgba(0,0,0,0.3) 100%
+            );
+            background-size: 200% 100%;
+            animation: lightShimmer 3.2s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        .flag-star {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 17px;
+            height: 17px;
+            fill: #ffffff;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35));
+        }
+
+        @keyframes flagWaving {
+            0% { transform: rotateY(0deg) skewY(0deg) scaleX(1); }
+            30% { transform: rotateY(14deg) skewY(-1.8deg) scaleX(0.97); }
+            70% { transform: rotateY(-10deg) skewY(2deg) scaleX(0.985); }
+            100% { transform: rotateY(16deg) skewY(-2.2deg) scaleX(0.96); }
+        }
+
+        @keyframes lightShimmer {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 0%; }
+        }
+
+        .header-btns {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-bell {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #161f30;
+            border: 1px solid var(--red);
+            color: #f87171;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(200, 16, 46, 0.25);
+        }
+
+        /* Tabs */
+        .tab-box {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: #05080e;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 3px;
+            margin-bottom: 8px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--sub);
+            padding: 8px 0;
+            font-size: 12px;
+            font-weight: 800;
+            border-radius: 9px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .tab-btn.active-news {
+            background-color: var(--red);
+            color: #fff;
+        }
+        .tab-btn.active-agenda {
+            background-color: var(--gold);
+            color: #090d16;
+        }
+
+        /* Zoekbalk Modal / Overlay */
+        #searchOverlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background-color: #0f172a;
+            border-bottom: 2px solid var(--gold);
+            padding: 12px 14px;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        #searchOverlay.open {
+            display: block;
+            animation: slideDown 0.2s ease-out;
+        }
+        @keyframes slideDown {
+            from { transform: translateX(-50%) translateY(-100%); }
+            to { transform: translateX(-50%) translateY(0); }
+        }
+
+        .search-inner {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .search-inner input {
+            flex: 1;
+            background-color: #1e293b;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 9px 12px;
+            color: #fff;
+            font-size: 13px;
+            outline: none;
+        }
+        .search-inner button {
+            background: #334155;
+            color: #fff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Horizontale pillen scroll */
+        .pill-row {
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+        .pill-row::-webkit-scrollbar { display: none; }
+
+        .pill {
+            flex-shrink: 0;
+            background-color: #111827;
+            border: 1px solid var(--border);
+            color: var(--sub);
+            padding: 6px 11px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .pill.active-pill-news {
+            background-color: var(--red);
+            border-color: var(--red);
+            color: #fff;
+        }
+        .pill.active-pill-agenda {
+            background-color: var(--gold);
+            border-color: var(--gold);
+            color: #090d16;
+            font-weight: 900;
+        }
+
+        /* Actieve zoekindicatie tag */
+        #activeSearchBadge {
+            display: none;
+            margin: 8px 14px 0;
+            background: rgba(255, 199, 44, 0.15);
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 11px;
+            color: var(--gold);
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Content list */
+        .content-wrap {
+            flex: 1;
+            padding: 12px 14px 85px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .feed-card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+            transition: transform 0.15s ease, border-color 0.2s ease;
+        }
+        .feed-card:active {
+            transform: scale(0.985);
+        }
+        .feed-card.loos-border {
+            border-color: rgba(255, 107, 0, 0.5);
+        }
+        .feed-card.stare-border {
+            border-color: rgba(255, 199, 44, 0.5);
+        }
+
+        .card-img-wrap {
+            width: 100%;
+            height: 150px;
+            position: relative;
+            background-color: #1e293b;
+        }
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .card-img-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            gap: 6px;
+        }
+
+        .card-img-time {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.7);
+            color: #f1f5f9;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 7px;
+            border-radius: 6px;
+            backdrop-filter: blur(4px);
+        }
+
+        .card-body {
+            padding: 12px 14px 14px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.35;
+            margin-bottom: 6px;
+        }
+
+        .card-snippet {
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.45;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            color: var(--gold);
+            font-weight: 700;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 8px;
+        }
+
+        .badge {
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            background-color: rgba(200, 16, 46, 0.85);
+            color: #fff;
+            backdrop-filter: blur(4px);
+        }
+        .badge.loos {
+            background-color: rgba(255, 107, 0, 0.9);
+            color: #fff;
+        }
+        .badge.stare {
+            background-color: rgba(255, 199, 44, 0.9);
+            color: #000;
+            font-weight: 900;
+        }
+        .badge.region {
+            background-color: rgba(56, 189, 248, 0.85);
+            color: #042f2e;
+            font-weight: 900;
+        }
+        .badge.vereniging {
+            background-color: rgba(168, 85, 247, 0.85);
+            color: #fff;
+        }
+
+        /* In-App Inline Frame Viewer */
+        #iframeContainer {
+            position: fixed;
+            inset: 0;
+            background-color: #0b0f19;
+            z-index: 100000;
+            display: none;
+            flex-direction: column;
+        }
+        #iframeContainer.open {
+            display: flex;
+        }
+
+        .iframe-toolbar {
+            background-color: #131c2e;
+            border-bottom: 1px solid var(--border);
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .iframe-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .iframe-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .iframe-url {
+            font-size: 10px;
+            color: var(--gold);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-toolbar {
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-close-viewer {
+            background-color: var(--red);
+            color: #fff;
+        }
+
+        .btn-ext-link {
+            background-color: #1e293b;
+            color: #cbd5e1;
+            border: 1px solid var(--border);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        #inAppFrame {
+            width: 100%;
+            flex: 1;
+            border: none;
+            background-color: #ffffff;
+        }
+
+        /* Bottom Navigatiebalk */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 9px 0;
+            z-index: 50;
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--sub);
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            cursor: pointer;
+        }
+        .nav-btn.active { color: var(--red); }
+        .nav-btn.active-gold { color: var(--gold); }
+        .nav-btn.alert { color: var(--alert-red); font-weight: 800; }
+    </style>
+</head>
+<body>
+
+    <div id="app">
+
+        <!-- Pop-up Melding (Toast) -->
+        <div id="toast" onclick="hideToast()">
+            <div class="toast-star">★</div>
+            <div style="flex:1; min-width:0;">
+                <div id="toastSub" style="font-size:9px; font-weight:900; color:var(--red); text-transform:uppercase;">Mestreech Breaking</div>
+                <div id="toastTitle" style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Nieuwsflits</div>
+                <div id="toastBody" style="font-size:11px; color:#cbd5e1;">Tik om direct in-app te bekijken</div>
+            </div>
+        </div>
+
+        <!-- Uitklapbaar Zoekvenster (Bedient via Zoekglas beneden) -->
+        <div id="searchOverlay">
+            <div class="search-inner">
+                <input type="text" id="popupSearchInput" placeholder="Zoek op trefwoord, buurt of gemeente..." oninput="onSearchChange(this.value)">
+                <button onclick="closeSearch()">✕ Sluiten</button>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header>
+            <div class="header-top">
+                <div class="logo-wrap">
+                    <!-- Geanimeerde Maastrichtse vlag -->
+                    <div class="flag-container" title="Mestreechter Veendel">
+                        <div class="flag-pole-knob"></div>
+                        <div class="flag-pole"></div>
+                        <div class="flag-wave">
+                            <svg class="flag-star" viewBox="0 0 51 48">
+                                <path d="m25.5 0 7.88 15.96 17.62 2.56-12.75 12.43 3.01 17.55-15.76-8.29-15.76 8.29 3.01-17.55-12.75-12.43 17.62-2.56z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div style="font-size:19px; font-weight:900; letter-spacing:-0.3px; color:#fff;">Mestreech Vendaog</div>
+                        <div style="font-size:10px; color:var(--sub); display:flex; align-items:center; gap:5px;">
+                            <span style="width:7px; height:7px; border-radius:50%; background:#10b981; display:inline-block;"></span>
+                            Stad, Buurten & Grensregio
+                        </div>
+                    </div>
+                </div>
+
+                <div class="header-btns">
+                    <button class="btn-bell" onclick="testNotification()" title="Test Melding">
+                        🔔
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="tab-box">
+                <button id="btnTabNews" class="tab-btn active-news" onclick="setTab('nieuws')">📰 Mestreechs Nieuws</button>
+                <button id="btnTabAgenda" class="tab-btn" onclick="setTab('agenda')">📅 Agenda & Regio</button>
+            </div>
+
+            <!-- Nieuws Filters -->
+            <div id="newsFilters" class="pill-row">
+                <button class="pill active-pill-news" onclick="setNewsFilter('alles', this)">🔥 Alles</button>
+                <button class="pill" onclick="setNewsFilter('Wat is loos', this)">⚡ Wat is Loos</button>
+                <button class="pill" onclick="setNewsFilter('De Nieuwe Ster', this)">⭐ De Nieuwe Ster</button>
+                <button class="pill" onclick="setNewsFilter('De Limburger', this)">📰 De Limburger</button>
+                <button class="pill" onclick="setNewsFilter('L1 / RTV', this)">📻 L1 / RTV</button>
+                <button class="pill" onclick="setNewsFilter('Socials', this)">💬 Socials (X/FB)</button>
+                <button class="pill" onclick="setNewsFilter('Gemeente', this)">🏛️ Gemeente & 112</button>
+            </div>
+
+            <!-- Agenda Filters -->
+            <div id="agendaFilters" class="pill-row" style="display:none;">
+                <button class="pill active-pill-agenda" onclick="setAgendaFilter('alles', this)">📅 Alles</button>
+                <button class="pill" onclick="setAgendaFilter('vandaag', this)">⚡ Vandaag</button>
+                <button class="pill" onclick="setAgendaFilter('morgen', this)">☀️ Morgen</button>
+                <button class="pill" onclick="setAgendaFilter('weekend', this)">🥂 Dit Weekend</button>
+                <button class="pill" onclick="setAgendaFilter('week', this)">🗓️ Komende Week</button>
+                <button class="pill" onclick="setAgendaFilter('Verenigingen', this)">🎺 Verenigingen</button>
+                <button class="pill" onclick="setAgendaFilter('Eijsden-Margraten', this)">🌳 Eijsden-Margraten</button>
+                <button class="pill" onclick="setAgendaFilter('Meerssen', this)">⛪ Meerssen</button>
+                <button class="pill" onclick="setAgendaFilter('Valkenburg', this)">🏰 Valkenburg</button>
+                <button class="pill" onclick="setAgendaFilter('Lanaken', this)">🇧🇪 Lanaken</button>
+                <button class="pill" onclick="setAgendaFilter('Riemst', this)">🇧🇪 Riemst</button>
+            </div>
+        </header>
+
+        <!-- Actieve zoekopdracht indicatie -->
+        <div id="activeSearchBadge">
+            <span id="activeSearchText">Zoeken: ...</span>
+            <span style="cursor:pointer; font-weight:bold; padding-left:8px;" onclick="resetSearch()">✕ Wis filter</span>
+        </div>
+
+        <!-- Content Lists -->
+        <div id="newsList" class="content-wrap"></div>
+        <div id="agendaList" class="content-wrap" style="display:none;"></div>
+
+        <!-- In-App Inline Frame Viewer (Voor 112 en originele artikelen) -->
+        <div id="iframeContainer">
+            <div class="iframe-toolbar">
+                <button class="btn-toolbar btn-close-viewer" onclick="closeInlineViewer()">
+                    ✕ Sluiten
+                </button>
+                <div class="iframe-info">
+                    <div id="frameTitle" class="iframe-title">Origineel bericht laden...</div>
+                    <div id="frameUrl" class="iframe-url">https://...</div>
+                </div>
+                <a id="frameExtLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-toolbar btn-ext-link" title="Open in externe browser">
+                    Browser ↗
+                </a>
+            </div>
+            <iframe id="inAppFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        </div>
+
+        <!-- Bottom Bar: Nuie Stare & Wat is Loos vervangen door Zoeken & 112 -->
+        <nav class="bottom-bar">
+            <!-- 1. Nieuws -->
+            <button id="navNews" class="nav-btn active" onclick="setTab('nieuws'); setNewsFilter('alles')">
+                <span style="font-size:17px;">📰</span>
+                <span>Nieuws</span>
+            </button>
+
+            <!-- 2. Agenda -->
+            <button id="navAgenda" class="nav-btn" onclick="setTab('agenda')">
+                <span style="font-size:17px;">📅</span>
+                <span>Agenda</span>
+            </button>
+
+            <!-- 3. Zoekglas knop ipv vast veld -->
+            <button class="nav-btn" onclick="openSearch()" title="Zoeken">
+                <span style="font-size:17px;">🔍</span>
+                <span>Zoeken</span>
+            </button>
+
+            <!-- 4. 112 Maastricht direct naar Stadindex -->
+            <button class="nav-btn alert" onclick="openInlineViewer('https://www.stadindex.nl/112/maastricht', '🚨 112 Meldingen Maastricht (P2000)')" title="112 Maastricht">
+                <span style="font-size:17px;">🚨</span>
+                <span>112 Melding</span>
+            </button>
+
+            <!-- 5. Meldingen Test -->
+            <button class="nav-btn" onclick="testNotification()">
+                <span style="font-size:17px;">🔔</span>
+                <span>Melding</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <script>
+        const newsData = [
+            {
+                id: 1,
+                title: "Wat is loos in Mestreech: Kettingbotsing met drie voertuigen op A2 richting Eindhoven",
+                source: "Wat is loos in Mestreech",
+                url: "https://watisloos.nl/",
+                category: "Wat is loos",
+                time: "15 min geleden",
+                image: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=700&q=80",
+                snippet: "Snelweg tijdelijk afgesloten na zware aanrijding tussen meerdere wagens. Hulpdiensten en bergingsbedrijven zijn massaal ter plaatse.",
+                locationTag: "A2 Maastricht"
+            },
+            {
+                id: 2,
+                title: "Wat is loos in Mestreech: Politie rukt uit voor personen met bivakmutsen op flatgalerij",
+                source: "Wat is loos in Mestreech",
+                url: "https://watisloos.nl/",
+                category: "Wat is loos",
+                time: "50 min geleden",
+                image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=700&q=80",
+                snippet: "Meerdere patrouilles en hondengeleiders omsingelden het wooncomplex na verontrustende meldingen van omwonenden.",
+                locationTag: "Malberg"
+            },
+            {
+                id: 3,
+                title: "De Nieuwe Ster: Ondernemers Wyck bezorgd over bereikbaarheid en parkeerplannen",
+                source: "De Nieuwe Ster",
+                url: "https://www.denieuwestermaastricht.nl/",
+                category: "De Nieuwe Ster",
+                time: "1 uur geleden",
+                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80",
+                snippet: "Winkeliers en horeca in de Rechtstraat vrezen omzetverlies door nieuwe gemeentelijke venstertijden en verkeersknipsels.",
+                locationTag: "Wyck"
+            },
+            {
+                id: 4,
+                title: "De Nieuwe Ster: Verhalen uit de wijken – Hoe levend is 't Mestreechs dialek?",
+                source: "De Nieuwe Ster",
+                url: "https://www.denieuwestermaastricht.nl/",
+                category: "De Nieuwe Ster",
+                time: "2 uur geleden",
+                image: "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=700&q=80",
+                snippet: "Een diepgaand portret over jongeren, carnavalsverenigingen en de toekomst van de Maastrichtse moedertaal in een internationale universiteitsstad.",
+                locationTag: "Cultuur"
+            },
+            {
+                id: 5,
+                title: "Vrijthof maakt zich op voor André Rieu zomerconcerten: opbouw van start",
+                source: "De Limburger",
+                url: "https://www.delimburger.nl/regio/maastricht",
+                category: "De Limburger",
+                time: "3 uur geleden",
+                image: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=700&q=80",
+                snippet: "Het grootste openluchtpodium van Nederland verrijst op het Vrijthof. Horecaondernemers zetten tienduizenden extra stoelen klaar.",
+                locationTag: "Vrijthof"
+            },
+            {
+                id: 6,
+                title: "L1 / RTV Maastricht: Live debat over de Maasboulevard en verkeersstromen",
+                source: "L1 / RTV",
+                url: "https://www.rtvmaastricht.nl",
+                category: "L1 / RTV",
+                time: "4 uur geleden",
+                image: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=700&q=80",
+                snippet: "Wethouders en bezorgde bewonersgroepen gingen fel in discussie over sluipverkeer tussen Céramique en de binnenstad.",
+                locationTag: "Centrum"
+            },
+            {
+                id: 7,
+                title: "Gemeente Maastricht: Restauratie historische kasseien Markt en Stadhuis",
+                source: "Gemeente",
+                url: "https://www.gemeentemaastricht.nl",
+                category: "Gemeente",
+                time: "5 uur geleden",
+                image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=700&q=80",
+                snippet: "Vaklieden herstellen verzakkingen rond het monumentale plein. De traditionele weekmarkt blijft gedurende de werkzaamheden toegankelijk.",
+                locationTag: "Markt"
+            }
+        ];
+
+        const agendaData = [
+            {
+                id: 101,
+                title: "Live Jazz op de Markt & Jekerterras",
+                location: "Markt & Jekerkwartier Maastricht",
+                timeLabel: "Vandaag • 19:30 uur",
+                period: "vandaag",
+                regionTag: "Maastricht",
+                price: "Gratis toegang",
+                image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=700&q=80",
+                snippet: "Gezellig terrasconcert met lokale Maastrichtse jazzmuzikanten. Geniet van muziek en een lokaal Mestreechs pilske.",
+                url: "https://www.bezoekmaastricht.nl/uitagenda"
+            },
+            {
+                id: 102,
+                title: "Riemst (BE): Fakkeltocht & Geheimen van Mergelgrotten Kanne",
+                location: "Avergat 14, 3770 Kanne (Riemst)",
+                timeLabel: "Vandaag • 20:30 uur",
+                period: "vandaag",
+                regionTag: "Riemst",
+                price: "€ 14,00",
+                image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80",
+                snippet: "Spectaculaire avondrondleiding bij kaarslicht door het ondergrondse labyrint van Kanne, net over de grens bij Maastricht.",
+                url: "https://www.riemst.be/nl/toerisme"
+            },
+            {
+                id: 103,
+                title: "Koninklijke Harmonie Sainte Cécile: Zomeravond Serenade",
+                location: "Vroenhof / Blekerij, Eijsden",
+                timeLabel: "Morgen • 19:45 uur",
+                period: "morgen",
+                regionTag: "Verenigingen",
+                price: "Vrije bijdrage",
+                image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=700&q=80",
+                snippet: "Het befaamde 'Rood van Eijsden' brengt een sfeervol openluchtconcert met klassieke marsen en filmmuziek.",
+                url: "https://www.visiteijsdenmargraten.nl/"
+            },
+            {
+                id: 104,
+                title: "Eijsden-Margraten: Landgoedfair & Ambachten rondom Kasteel Eijsden",
+                location: "Kasteellaan 1, Eijsden",
+                timeLabel: "Morgen • 10:00 - 17:00 uur",
+                period: "morgen",
+                regionTag: "Eijsden-Margraten",
+                price: "€ 6,50",
+                image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=700&q=80",
+                snippet: "Bourgondische streekmarkt, antiek, kunst en lokale wijnen uit het Maasdal in de kasteeltuinen.",
+                url: "https://www.visiteijsdenmargraten.nl/"
+            },
+            {
+                id: 105,
+                title: "Lanaken (BE): Zomerfestival & Kids Doe-Dag Pietersheim",
+                location: "Waterburcht Pietersheim, Lanaken",
+                timeLabel: "Dit Weekend • Za & Zo v.a. 12:00",
+                period: "weekend",
+                regionTag: "Lanaken",
+                price: "Gratis entree",
+                image: "https://images.unsplash.com/photo-1472653431158-6364773b2a56?auto=format&fit=crop&w=700&q=80",
+                snippet: "Ontdek de 12e-eeuwse waterburcht, kinderboerderij en middeleeuwse spelen voor de hele familie.",
+                url: "https://www.lanaken.be/toerisme"
+            },
+            {
+                id: 106,
+                title: "Valkenburg aan de Geul: Openlucht Ridderspektakel & Vuurshow",
+                location: "Grendelplein / Kasteelruïne Valkenburg",
+                timeLabel: "Dit Weekend • Zaterdag 21:00",
+                period: "weekend",
+                regionTag: "Valkenburg",
+                price: "€ 12,50",
+                image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=700&q=80",
+                snippet: "Magische vuurspuwers, verlichte kasteelmuren en akoestische middeleeuwse folkmuziek hoog boven het Geuldal.",
+                url: "https://www.visitzuidlimburg.nl/agenda/"
+            },
+            {
+                id: 107,
+                title: "Meerssen: Orgelconcert & Barokmiddag in de Basiliek",
+                location: "Markt 37, Basiliek van het H. Sacrament",
+                timeLabel: "Dit Weekend • Zondag 15:00 uur",
+                period: "weekend",
+                regionTag: "Meerssen",
+                price: "Gratis (deurcollecte)",
+                image: "https://images.unsplash.com/photo-1548625361-16a75095d909?auto=format&fit=crop&w=700&q=80",
+                snippet: "Geniet van de magistrale akoestiek in het gotische pronkstuk van Meerssen met meesterwerken van Bach.",
+                url: "https://www.meerssen.nl"
+            },
+            {
+                id: 108,
+                title: "Schuttersfeest Bond Gerardus: Optocht & Schietwedstrijden",
+                location: "Schuttersterrein Gronsveld",
+                timeLabel: "Komende Week • Donderdag 13:00",
+                period: "week",
+                regionTag: "Verenigingen",
+                price: "Gratis",
+                image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=700&q=80",
+                snippet: "Kleurrijke historische optocht van meer dan 20 Zuid-Limburgse schutterijen in vol ornaat met vaandels en buksen.",
+                url: "https://www.denieuwestermaastricht.nl/"
+            },
+            {
+                id: 109,
+                title: "Riemst (BE): Brug van Vroenhoven Expo & Streekwijnen",
+                location: "Maastrichtersteenweg 212, Vroenhoven",
+                timeLabel: "Komende Week • Woensdag t/m Zondag",
+                period: "week",
+                regionTag: "Riemst",
+                price: "€ 8,00",
+                image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=700&q=80",
+                snippet: "Beleef de opening van de Tweede Wereldoorlog en ontdek de geheimen van het Albertkanaal en Haspengouwse wijnen.",
+                url: "https://www.riemst.be/nl/ontdekken/bezienswaardigheden/de-brug-van-vroenhoven"
+            }
+        ];
+
+        let currentTab = 'nieuws';
+        let currentNewsFilter = 'alles';
+        let currentAgendaFilter = 'alles';
+        let searchQuery = '';
+
+        function render() {
+            if (currentTab === 'nieuws') {
+                renderNews();
+            } else {
+                renderAgenda();
+            }
+
+            const badge = document.getElementById('activeSearchBadge');
+            const badgeText = document.getElementById('activeSearchText');
+            if (searchQuery.trim().length > 0) {
+                badge.style.display = 'flex';
+                badgeText.textContent = `Zoekresultaten voor: "${searchQuery}"`;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function renderNews() {
+            const listEl = document.getElementById('newsList');
+
+            let filtered = newsData.filter(item => {
+                const matchFilter = (currentNewsFilter === 'alles') || (item.category === currentNewsFilter);
+                const q = searchQuery.toLowerCase();
+                const matchSearch = !q || item.title.toLowerCase().includes(q) || item.snippet.toLowerCase().includes(q) || item.source.toLowerCase().includes(q) || item.locationTag.toLowerCase().includes(q);
+                return matchFilter && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = '<div style="text-align:center; padding:40px 10px; color:#64748b;">Geen nieuws gevonden voor deze zoekopdracht.</div>';
+                return;
+            }
+
+            let html = '';
+            for (let i = 0; i < filtered.length; i++) {
+                const it = filtered[i];
+                const isLoos = it.source === 'Wat is loos in Mestreech';
+                const isStare = it.source === 'De Nieuwe Ster';
+                const borderClass = isLoos ? 'loos-border' : (isStare ? 'stare-border' : '');
+                const badgeClass = isLoos ? 'loos' : (isStare ? 'stare' : '');
+                const iconPrefix = isLoos ? '⚡ ' : (isStare ? '★ ' : '');
+
+                html += `
+                    <div class="feed-card ${borderClass}" onclick="openInlineViewer('${it.url}', '${escapeHtml(it.title)}')">
+                        <div class="card-img-wrap">
+                            <img src="${it.image}" alt="${escapeHtml(it.title)}" loading="lazy">
+                            <div class="card-img-overlay">
+                                <span class="badge ${badgeClass}">${iconPrefix}${it.source}</span>
+                            </div>
+                            <span class="card-img-time">🕒 ${it.time}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">${it.title}</div>
+                            <div class="card-snippet">${it.snippet}</div>
+                            <div class="card-footer">
+                                <span>📍 ${it.locationTag}</span>
+                                <span>Lees origineel in app ➔</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            listEl.innerHTML = html;
+        }
+
+        function renderAgenda() {
+            const listEl = document.getElementById('agendaList');
+
+            let filtered = agendaData.filter(item => {
+                let matchFilter = false;
+                if (currentAgendaFilter === 'alles') {
+                    matchFilter = true;
+                } else if (['vandaag', 'morgen', 'weekend', 'week'].includes(currentAgendaFilter)) {
+                    matchFilter = item.period === currentAgendaFilter;
+                } else {
+                    matchFilter = (item.regionTag === currentAgendaFilter);
+                }
+
+                const q = searchQuery.toLowerCase();
+                const matchSearch = !q || item.title.toLowerCase().includes(q) || item.location.toLowerCase().includes(q) || item.regionTag.toLowerCase().includes(q) || item.snippet.toLowerCase().includes(q);
+                return matchFilter && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = '<div style="text-align:center; padding:40px 10px; color:#64748b;">Geen activiteiten gevonden voor deze selectie.</div>';
+                return;
+            }
+
+            let html = '';
+            for (let i = 0; i < filtered.length; i++) {
+                const it = filtered[i];
+                const isBelgie = it.regionTag === 'Riemst' || it.regionTag === 'Lanaken';
+                const isVereniging = it.regionTag === 'Verenigingen';
+                let tagClass = 'region';
+                if (isBelgie) tagClass = 'region';
+                if (isVereniging) tagClass = 'vereniging';
+
+                html += `
+                    <div class="feed-card" onclick="openInlineViewer('${it.url}', '${escapeHtml(it.title)}')">
+                        <div class="card-img-wrap">
+                            <img src="${it.image}" alt="${escapeHtml(it.title)}" loading="lazy">
+                            <div class="card-img-overlay">
+                                <span class="badge ${tagClass}">${it.regionTag}</span>
+                            </div>
+                            <span class="card-img-time" style="color:var(--gold); font-weight:800;">${it.price}</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">${it.title}</div>
+                            <div style="font-size:12px; color:var(--gold); font-weight:800; margin-bottom:4px;">🕒 ${it.timeLabel}</div>
+                            <div class="card-snippet">${it.snippet}</div>
+                            <div class="card-footer">
+                                <span>📍 ${it.location}</span>
+                                <span>Programma & info ➔</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            listEl.innerHTML = html;
+        }
+
+        /* Direct in-app openen zonder de app te verlaten (werkt ook voor Stadindex 112) */
+        function openInlineViewer(url, title) {
+            const container = document.getElementById('iframeContainer');
+            const frame = document.getElementById('inAppFrame');
+            const titleEl = document.getElementById('frameTitle');
+            const urlEl = document.getElementById('frameUrl');
+            const extLink = document.getElementById('frameExtLink');
+
+            titleEl.textContent = title || "Origineel bericht";
+            urlEl.textContent = url;
+            extLink.href = url;
+            frame.src = url;
+
+            container.className = 'open';
+        }
+
+        function closeInlineViewer() {
+            const container = document.getElementById('iframeContainer');
+            const frame = document.getElementById('inAppFrame');
+            container.className = '';
+            frame.src = 'about:blank';
+        }
+
+        /* Zoekglas overlay functies */
+        function openSearch() {
+            const overlay = document.getElementById('searchOverlay');
+            const input = document.getElementById('popupSearchInput');
+            overlay.className = 'open';
+            input.focus();
+        }
+
+        function closeSearch() {
+            document.getElementById('searchOverlay').className = '';
+        }
+
+        function resetSearch() {
+            searchQuery = '';
+            document.getElementById('popupSearchInput').value = '';
+            render();
+        }
+
+        function onSearchChange(val) {
+            searchQuery = val;
+            render();
+        }
+
+        function setTab(tab) {
+            currentTab = tab;
+            const newsList = document.getElementById('newsList');
+            const agendaList = document.getElementById('agendaList');
+            const newsFilters = document.getElementById('newsFilters');
+            const agendaFilters = document.getElementById('agendaFilters');
+            const btnNews = document.getElementById('btnTabNews');
+            const btnAgenda = document.getElementById('btnTabAgenda');
+            const navNews = document.getElementById('navNews');
+            const navAgenda = document.getElementById('navAgenda');
+
+            if (tab === 'nieuws') {
+                newsList.style.display = 'flex';
+                agendaList.style.display = 'none';
+                newsFilters.style.display = 'flex';
+                agendaFilters.style.display = 'none';
+
+                btnNews.className = 'tab-btn active-news';
+                btnAgenda.className = 'tab-btn';
+                navNews.className = 'nav-btn active';
+                navAgenda.className = 'nav-btn';
+            } else {
+                newsList.style.display = 'none';
+                agendaList.style.display = 'flex';
+                newsFilters.style.display = 'none';
+                agendaFilters.style.display = 'flex';
+
+                btnNews.className = 'tab-btn';
+                btnAgenda.className = 'tab-btn active-agenda';
+                navNews.className = 'nav-btn';
+                navAgenda.className = 'nav-btn active-gold';
+            }
+            render();
+        }
+
+        function setNewsFilter(category, btnElement) {
+            currentNewsFilter = category;
+            const pills = document.querySelectorAll('#newsFilters .pill');
+            pills.forEach(p => {
+                if (p.textContent.includes(category) || (category === 'alles' && p.textContent.includes('Alles'))) {
+                    p.className = 'pill active-pill-news';
+                } else {
+                    p.className = 'pill';
+                }
+            });
+            render();
+        }
+
+        function setAgendaFilter(filterVal, btnElement) {
+            currentAgendaFilter = filterVal;
+            const pills = document.querySelectorAll('#agendaFilters .pill');
+            pills.forEach(p => p.className = 'pill');
+            if (btnElement) {
+                btnElement.className = 'pill active-pill-agenda';
+            } else {
+                pills[0].className = 'pill active-pill-agenda';
+            }
+            render();
+        }
+
+        function testNotification() {
+            const alerts = [
+                { 
+                    sub: "🚨 112 P2000 Maastricht",
+                    title: "Brandweer met spoed naar Céramique", 
+                    body: "Melding automatische brandmelder. Hulpdiensten onderweg.", 
+                    url: "https://www.stadindex.nl/112/maastricht" 
+                },
+                { 
+                    sub: "⚡ Wat is loos in Mestreech: 112 Eilmeldung",
+                    title: "Kettingbotsing A2 Maastricht - Eindhoven", 
+                    body: "Snelweg tijdelijk dicht. Hulpdiensten ter plaatse.", 
+                    url: "https://watisloos.nl/" 
+                },
+                { 
+                    sub: "⭐ De Nieuwe Ster: Wyck",
+                    title: "Ondernemers luiden noodklok over parkeren", 
+                    body: "Lees de reportage over de Rechtstraat in Wyck.", 
+                    url: "https://www.denieuwestermaastricht.nl/" 
+                }
+            ];
+            const chosen = alerts[Math.floor(Math.random() * alerts.length)];
+
+            const toast = document.getElementById('toast');
+            document.getElementById('toastSub').textContent = chosen.sub;
+            document.getElementById('toastTitle').textContent = chosen.title;
+            document.getElementById('toastBody').textContent = chosen.body;
+            toast.onclick = function() {
+                hideToast();
+                openInlineViewer(chosen.url, chosen.title);
+            };
+
+            toast.className = 'active';
+
+            setTimeout(() => {
+                hideToast();
+            }, 5000);
+        }
+
+        function hideToast() {
+            document.getElementById('toast').className = '';
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        render();
+    </script>
+</body>
+</html>
+```
