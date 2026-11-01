@@ -1,0 +1,12 @@
+{
+  "name": "mestreech-vendaog",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "mkdir -p www"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/android": "^6.0.0"
+  }
+}
