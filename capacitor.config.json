@@ -1,0 +1,10 @@
+{
+  "appId": "nl.mestreechvendaog.app",
+  "appName": "Mestreech Vendaog",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": true
+  }
+}
