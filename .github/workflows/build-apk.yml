@@ -1,47 +1,80 @@
 name: Build Android APK
 
-on:
-  push:
-    branches: [ main, master ]
-  workflow_dispatch:
+​on:
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+push:
 
-    steps:
-      - name: Code ophalen
-        uses: actions/checkout@v4
+branches: [ main, master ]
 
-      - name: Node.js 20 installeren
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+workflow_dispatch:
 
-      - name: Java JDK 17 instellen
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
+​jobs:
 
-      - name: Android SDK klaarzetten
-        uses: android-actions/setup-android@v3
+build:
 
-      - name: Dependencies en Capacitor installeren
-        run: |
-          npm install
-          npx cap init "Mestreech Vendaog" "nl.mestreechvendaog.app" --web-dir www
-          npx cap add android
-          npx cap sync android
+runs-on: ubuntu-latest
 
-      - name: APK compileren met Gradle
-        working-directory: android
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+​steps:
 
-      - name: APK uploaden als downloadbaar bestand
-        uses: actions/upload-artifact@v4
-        with:
-          name: Mestreech-Vendaog-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+- name: Code ophalen
+
+uses: actions/checkout@v4
+
+​- name: Node.js 20 instellen
+
+uses: actions/setup-node@v4
+
+with:
+
+node-version: 20
+
+​- name: Java JDK 17 instellen
+
+uses: actions/setup-java@v4
+
+with:
+
+distribution: 'temurin'
+
+java-version: '17'
+
+​- name: Android SDK Licenties Accepteren
+
+run: |
+
+yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses || true
+
+​- name: Dependencies en Capacitor project opbouwen
+
+run: |
+
+npm install
+
+mkdir -p www
+
+cp -f maastricht_nieuws_app.html www/index.html 2>/dev/null || true
+
+npx cap add android || true
+
+npx cap sync android
+
+​- name: APK compileren met Gradle
+
+working-directory: android
+
+run: |
+
+chmod +x gradlew
+
+./gradlew assembleDebug --no-daemon --stacktrace
+
+​- name: APK uploaden als downloadbaar bestand
+
+uses: actions/upload-artifact@v4
+
+with:
+
+name: Mestreech-Vendaog-APK
+
+path: android/app/build/outputs/apk/debug/app-debug.apk
+
