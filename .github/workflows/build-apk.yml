@@ -1,5 +1,4 @@
 name: Build Android APK
-
 on:
   push:
     branches: [ main, master ]
@@ -8,7 +7,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,21 +22,19 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Capacitor
+      - name: Build Project
         run: |
           npm install
-          mkdir -p www
-          cp -f maastricht_nieuws_app.html www/index.html 2>/dev/null || true
           npx cap add android || true
           npx cap sync android
 
-      - name: Build APK
-        working-directory: android
+      - name: Compile APK
         run: |
+          cd android
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
 
-      - name: Upload APK
+      - name: Save APK
         uses: actions/upload-artifact@v4
         with:
           name: Mestreech-Vendaog-APK
