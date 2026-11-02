@@ -1,670 +1,711 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mestreech Vendaog</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        :root {
-            --red: #C8102E;
-            --gold: #FFC72C;
-            --bg: #090d16;
-            --card: #131b2e;
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #f8fafc;
-            --sub: #94a3b8;
-        }
-
-        body {
-            background-color: #030712;
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        /* Responsive container: past perfect op mobiel én tablet/landscape */
-        #app {
-            width: 100%;
-            max-width: 680px;
-            min-height: 100vh;
-            background-color: var(--bg);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 0 40px rgba(0,0,0,0.9);
-        }
-
-        /* Header met wapperende Maastrichtse vlag */
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 40;
-            border-bottom: 1px solid var(--border);
-            padding: 14px 16px 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-        }
-
-        .header-flag-bg {
-            position: absolute;
-            inset: -15px;
-            z-index: 1;
-            background-color: #ba0c2f;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .flag-star-svg {
-            position: absolute;
-            left: 10%;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 140px;
-            height: 140px;
-            fill: #ffffff;
-            opacity: 0.85;
-            filter: drop-shadow(2px 4px 10px rgba(0,0,0,0.45));
-            animation: flagWaveMotion 4s ease-in-out infinite alternate;
-        }
-
-        .flag-folds-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                95deg,
-                rgba(0,0,0,0.65) 0%,
-                rgba(255,255,255,0.2) 20%,
-                rgba(0,0,0,0.45) 45%,
-                rgba(255,255,255,0.25) 68%,
-                rgba(0,0,0,0.7) 100%
-            );
-            background-size: 250% 100%;
-            mix-blend-mode: overlay;
-            animation: flagShimmer 4s ease-in-out infinite alternate;
-        }
-
-        .header-dark-tint {
-            position: absolute;
-            inset: 0;
-            z-index: 2;
-            background: linear-gradient(180deg, rgba(9, 13, 22, 0.6) 0%, rgba(9, 13, 22, 0.88) 100%);
-            pointer-events: none;
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 3;
-        }
-
-        @keyframes flagWaveMotion {
-            0% { transform: translateY(-50%) rotate(0deg) skewX(0deg); }
-            50% { transform: translateY(-48%) rotate(2deg) skewX(2deg); }
-            100% { transform: translateY(-52%) rotate(-1.5deg) skewX(-1.5deg); }
-        }
-
-        @keyframes flagShimmer {
-            0% { background-position: 0% 0%; }
-            100% { background-position: 100% 0%; }
-        }
-
-        .header-top {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 12px;
-        }
-
-        .tab-box {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 12px;
-            padding: 3px;
-            margin-bottom: 9px;
-        }
-
-        .tab-btn {
-            background: transparent;
-            border: none;
-            color: #cbd5e1;
-            padding: 9px 0;
-            font-size: 13px;
-            font-weight: 800;
-            border-radius: 9px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s ease;
-        }
-        .tab-btn.active-news {
-            background: rgba(200, 16, 46, 0.9);
-            color: #ffffff;
-        }
-        .tab-btn.active-agenda {
-            background: rgba(255, 199, 44, 0.92);
-            color: #090d16;
-            font-weight: 900;
-        }
-
-        .pill-row {
-            display: flex;
-            gap: 6px;
-            overflow-x: auto;
-            padding-bottom: 2px;
-            scrollbar-width: none;
-        }
-        .pill-row::-webkit-scrollbar { display: none; }
-
-        .pill {
-            flex-shrink: 0;
-            background: rgba(19, 27, 46, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #cbd5e1;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        .pill.active-pill-news {
-            background: var(--red);
-            border-color: var(--red);
-            color: #ffffff;
-        }
-        .pill.active-pill-agenda {
-            background: var(--gold);
-            border-color: var(--gold);
-            color: #090d16;
-            font-weight: 900;
-        }
-
-        /* Feed Cards */
-        .content-wrap {
-            flex: 1;
-            padding: 14px 16px 90px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .feed-card {
-            background-color: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            cursor: pointer;
-            transition: transform 0.15s ease;
-        }
-        .feed-card:active {
-            transform: scale(0.99);
-        }
-
-        .card-img-wrap {
-            width: 100%;
-            height: 175px;
-            position: relative;
-            background-color: #1e293b;
-        }
-        .card-img-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        .card-img-overlay {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-        }
-
-        .card-img-time {
-            position: absolute;
-            bottom: 8px;
-            right: 8px;
-            background: rgba(0,0,0,0.75);
-            color: #f1f5f9;
-            font-size: 10px;
-            font-weight: 700;
-            padding: 3px 7px;
-            border-radius: 6px;
-            backdrop-filter: blur(4px);
-        }
-
-        .card-body {
-            padding: 12px 14px 14px;
-        }
-
-        .card-title {
-            font-size: 15px;
-            font-weight: 800;
-            color: #ffffff;
-            line-height: 1.35;
-            margin-bottom: 6px;
-        }
-
-        .card-snippet {
-            font-size: 12px;
-            color: #94a3b8;
-            line-height: 1.45;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 11px;
-            color: var(--gold);
-            font-weight: 700;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            padding-top: 8px;
-        }
-
-        .btn-share {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #cbd5e1;
-            padding: 4px 9px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .badge {
-            font-size: 10px;
-            font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 6px;
-            background-color: rgba(200, 16, 46, 0.9);
-            color: #fff;
-        }
-        .badge.stare { background-color: var(--gold); color: #000; font-weight: 900; }
-        .badge.animal { background-color: #14b8a6; color: #fff; }
-
-        /* Viewer */
-        #iframeContainer {
-            position: fixed;
-            inset: 0;
-            background-color: #070b12;
-            z-index: 100000;
-            display: none;
-            flex-direction: column;
-        }
-        #iframeContainer.open { display: flex; }
-
-        .iframe-toolbar {
-            background-color: #111a2c;
-            border-bottom: 1px solid var(--border);
-            padding: 10px 14px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .btn-close-viewer {
-            background-color: var(--red);
-            color: #fff;
-            padding: 7px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: 800;
-            border: none;
-            cursor: pointer;
-        }
-
-        #inAppFrame {
-            flex: 1;
-            width: 100%;
-            border: none;
-            background-color: #fff;
-        }
-
-        /* Bottom Nav */
-        .bottom-bar {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 680px;
-            background-color: rgba(9, 13, 22, 0.95);
-            backdrop-filter: blur(14px);
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: space-around;
-            padding: 9px 0;
-            z-index: 50;
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: var(--sub);
-            font-size: 11px;
-            font-weight: 700;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            cursor: pointer;
-        }
-        .nav-btn.active { color: var(--red); }
-        .nav-btn.active-gold { color: var(--gold); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mestreech Vendaog</title>
+<style>
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+-webkit-tap-highlight-color: transparent;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+​:root {
+--red: #C8102E;
+--gold: #FFC72C;
+--bg: #090d16;
+--card: #131b2e;
+--border: rgba(255, 255, 255, 0.09);
+--text: #f8fafc;
+--sub: #94a3b8;
+--green: #10b981;
+}
+​body {
+background-color: #030712;
+color: var(--text);
+display: flex;
+justify-content: center;
+min-height: 100vh;
+}
+​/* Responsive container: past perfect in portrait én breidt mee uit in landscape */
+#app {
+width: 100%;
+max-width: 768px;
+min-height: 100vh;
+background-color: var(--bg);
+display: flex;
+flex-direction: column;
+position: relative;
+box-shadow: 0 0 40px rgba(0,0,0,0.9);
+}
+​/* HEADER MET WAPPERENDE MAASTRICHTSE VLAG */
+header {
+position: sticky;
+top: 0;
+z-index: 40;
+border-bottom: 1px solid var(--border);
+padding: 12px 16px 10px;
+overflow: hidden;
+box-shadow: 0 4px 20px rgba(0,0,0,0.55);
+}
+​.header-flag-bg {
+position: absolute;
+inset: -15px;
+z-index: 1;
+background-color: #ba0c2f;
+overflow: hidden;
+pointer-events: none;
+}
+​.flag-star-svg {
+position: absolute;
+left: 8%;
+top: 50%;
+transform: translateY(-50%);
+width: 140px;
+height: 140px;
+fill: #ffffff;
+opacity: 0.88;
+filter: drop-shadow(2px 4px 10px rgba(0,0,0,0.45));
+animation: flagWaveMotion 4s ease-in-out infinite alternate;
+}
+​.flag-folds-overlay {
+position: absolute;
+inset: 0;
+background: linear-gradient(
+95deg,
+rgba(0,0,0,0.65) 0%,
+rgba(255,255,255,0.2) 20%,
+rgba(0,0,0,0.45) 45%,
+rgba(255,255,255,0.25) 68%,
+rgba(0,0,0,0.7) 100%
+);
+background-size: 250% 100%;
+mix-blend-mode: overlay;
+animation: flagShimmer 4s ease-in-out infinite alternate;
+}
+​.header-dark-tint {
+position: absolute;
+inset: 0;
+z-index: 2;
+background: linear-gradient(180deg, rgba(9, 13, 22, 0.55) 0%, rgba(9, 13, 22, 0.88) 100%);
+pointer-events: none;
+}
+​.header-content {
+position: relative;
+z-index: 3;
+}
+​@keyframes flagWaveMotion {
+0% { transform: translateY(-50%) rotate(0deg) skewX(0deg); }
+50% { transform: translateY(-48%) rotate(2deg) skewX(2deg); }
+100% { transform: translateY(-52%) rotate(-1.5deg) skewX(-1.5deg); }
+}
+​@keyframes flagShimmer {
+0% { background-position: 0% 0%; }
+100% { background-position: 100% 0%; }
+}
+​.header-top {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 10px;
+}
+​.live-status-pill {
+display: flex;
+align-items: center;
+gap: 5px;
+font-size: 10px;
+font-weight: 700;
+color: #e2e8f0;
+background: rgba(0,0,0,0.35);
+padding: 3px 8px;
+border-radius: 12px;
+border: 1px solid rgba(255,255,255,0.15);
+}
+​.dot-pulse {
+width: 7px;
+height: 7px;
+border-radius: 50%;
+background-color: var(--green);
+box-shadow: 0 0 6px var(--green);
+}
+​/* Tabs Mestreechs Nuijts & Callepin */
+.tab-box {
+display: grid;
+grid-template-columns: 1fr 1fr;
+background: rgba(0, 0, 0, 0.4);
+backdrop-filter: blur(12px);
+border: 1px solid rgba(255, 255, 255, 0.15);
+border-radius: 12px;
+padding: 3px;
+}
+​.tab-btn {
+background: transparent;
+border: none;
+color: #cbd5e1;
+padding: 9px 0;
+font-size: 13px;
+font-weight: 800;
+border-radius: 9px;
+cursor: pointer;
+text-align: center;
+transition: all 0.2s ease;
+}
+.tab-btn.active-news {
+background: rgba(200, 16, 46, 0.9);
+color: #ffffff;
+}
+.tab-btn.active-agenda {
+background: rgba(255, 199, 44, 0.92);
+color: #090d16;
+font-weight: 900;
+}
+​/* Standaard verborgen in staande modus (houdt de UI strak en rustig) */
+.pill-row {
+display: none;
+gap: 6px;
+overflow-x: auto;
+padding-top: 8px;
+scrollbar-width: none;
+}
+.pill-row::-webkit-scrollbar { display: none; }
+​/* Wordt automatisch zichtbaar in Landscape/breedbeeld voor extra comfort */
+@media (orientation: landscape) and (min-width: 600px) {
+.pill-row.landscape-visible { display: flex; }
+}
+​.pill {
+flex-shrink: 0;
+background: rgba(19, 27, 46, 0.65);
+backdrop-filter: blur(8px);
+border: 1px solid rgba(255, 255, 255, 0.15);
+color: #cbd5e1;
+padding: 5px 12px;
+border-radius: 20px;
+font-size: 11px;
+font-weight: 700;
+cursor: pointer;
+white-space: nowrap;
+}
+.pill.active-pill-news {
+background: var(--red);
+border-color: var(--red);
+color: #ffffff;
+}
+​/* Zoekglas pop-up overlay */
+#searchOverlay {
+display: none;
+position: sticky;
+top: 0;
+z-index: 50;
+background-color: rgba(9, 13, 22, 0.98);
+border-bottom: 2px solid var(--gold);
+padding: 10px 14px;
+box-shadow: 0 8px 24px rgba(0,0,0,0.8);
+}
+#searchOverlay.open {
+display: block;
+}
+​.search-inner {
+display: flex;
+gap: 8px;
+align-items: center;
+}
+.search-inner input {
+flex: 1;
+background-color: #1e293b;
+border: 1px solid var(--border);
+border-radius: 10px;
+padding: 9px 12px;
+color: #fff;
+font-size: 13px;
+outline: none;
+}
+.search-inner button {
+background: #334155;
+color: #fff;
+border: none;
+padding: 8px 12px;
+border-radius: 10px;
+font-size: 12px;
+font-weight: bold;
+cursor: pointer;
+}
+​/* Content feed */
+.content-wrap {
+flex: 1;
+padding: 12px 14px 90px;
+display: flex;
+flex-direction: column;
+gap: 12px;
+}
+​.feed-card {
+background-color: var(--card);
+border: 1px solid var(--border);
+border-radius: 14px;
+overflow: hidden;
+display: flex;
+flex-direction: column;
+cursor: pointer;
+transition: transform 0.12s ease;
+}
+.feed-card:active {
+transform: scale(0.99);
+}
+​.card-img-wrap {
+width: 100%;
+height: 175px;
+position: relative;
+background-color: #1a2436;
+}
+.card-img-wrap img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+display: block;
+}
+​.card-img-overlay {
+position: absolute;
+top: 10px;
+left: 10px;
+}
+​.card-img-time {
+position: absolute;
+bottom: 8px;
+right: 8px;
+background: rgba(0,0,0,0.75);
+color: #f1f5f9;
+font-size: 10px;
+font-weight: 700;
+padding: 3px 7px;
+border-radius: 6px;
+backdrop-filter: blur(4px);
+}
+​.card-body {
+padding: 12px 14px 14px;
+}
+​.card-title {
+font-size: 15px;
+font-weight: 800;
+color: #ffffff;
+line-height: 1.35;
+margin-bottom: 6px;
+}
+​.card-snippet {
+font-size: 12px;
+color: #94a3b8;
+line-height: 1.45;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
+overflow: hidden;
+margin-bottom: 10px;
+}
+​.card-footer {
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 11px;
+color: var(--gold);
+font-weight: 700;
+border-top: 1px solid rgba(255,255,255,0.06);
+padding-top: 8px;
+}
+​.btn-share {
+background: rgba(255, 255, 255, 0.08);
+border: 1px solid rgba(255, 255, 255, 0.15);
+color: #cbd5e1;
+padding: 4px 9px;
+border-radius: 8px;
+font-size: 11px;
+font-weight: 700;
+cursor: pointer;
+}
+​.badge {
+font-size: 10px;
+font-weight: 800;
+padding: 3px 8px;
+border-radius: 6px;
+background-color: rgba(200, 16, 46, 0.9);
+color: #fff;
+}
+.badge.stare { background-color: var(--gold); color: #000; font-weight: 900; }
+.badge.loos { background-color: #ff6b00; color: #fff; }
+.badge.animal { background-color: #14b8a6; color: #fff; }
+​/* In-App Viewer */
+#iframeContainer {
+position: fixed;
+inset: 0;
+background-color: #070b12;
+z-index: 100000;
+display: none;
+flex-direction: column;
+}
+#iframeContainer.open { display: flex; }
+​.iframe-toolbar {
+background-color: #111a2c;
+border-bottom: 1px solid var(--border);
+padding: 10px 14px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+}
+​.btn-close-viewer {
+background-color: var(--red);
+color: #fff;
+padding: 7px 12px;
+border-radius: 8px;
+font-size: 11px;
+font-weight: 800;
+border: none;
+cursor: pointer;
+}
+​#inAppFrame {
+flex: 1;
+width: 100%;
+border: none;
+background-color: #fff;
+}
+​/* Bottom Navigatiebalk */
+.bottom-bar {
+position: fixed;
+bottom: 0;
+left: 50%;
+transform: translateX(-50%);
+width: 100%;
+max-width: 768px;
+background-color: rgba(9, 13, 22, 0.95);
+backdrop-filter: blur(14px);
+border-top: 1px solid var(--border);
+display: flex;
+justify-content: space-around;
+padding: 8px 0;
+z-index: 50;
+}
+​.nav-btn {
+background: none;
+border: none;
+color: var(--sub);
+font-size: 11px;
+font-weight: 700;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 3px;
+cursor: pointer;
+}
+.nav-btn.active { color: var(--red); }
+.nav-btn.active-gold { color: var(--gold); }
+</style>
 </head>
 <body>
-
-    <div id="app">
-        <!-- Header -->
-        <header>
-            <div class="header-flag-bg">
-                <svg class="flag-star-svg" viewBox="0 0 51 48">
-                    <path d="m25.5 0 7.88 15.96 17.62 2.56-12.75 12.43 3.01 17.55-15.76-8.29-15.76 8.29 3.01-17.55-12.75-12.43 17.62-2.56z"/>
-                </svg>
-                <div class="flag-folds-overlay"></div>
-            </div>
-            <div class="header-dark-tint"></div>
-
-            <div class="header-content">
-                <div class="header-top">
-                    <div>
-                        <div style="font-size:21px; font-weight:900; letter-spacing:-0.3px; color:#fff;">
-                            Mestreech Vendaog
-                        </div>
-                        <div style="font-size:11px; color:#cbd5e1; font-weight:600;">
-                            Live Nuijts, Callepin & Grensregio
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabs -->
-                <div class="tab-box">
-                    <button id="btnTabNews" class="tab-btn active-news" onclick="setTab('nieuws')">📰 Mestreechs Nuijts</button>
-                    <button id="btnTabAgenda" class="tab-btn" onclick="setTab('agenda')">📒 Callepin</button>
-                </div>
-
-                <!-- Filters -->
-                <div id="newsFilters" class="pill-row">
-                    <button class="pill active-pill-news" onclick="setNewsFilter('alles', this)">🔥 Alles</button>
-                    <button class="pill" onclick="setNewsFilter('Vermist dier', this)">🐾 Vermiste Diere</button>
-                    <button class="pill" onclick="setNewsFilter('Wat is loos', this)">⚡ Wat is Loos</button>
-                    <button class="pill" onclick="setNewsFilter('De Nieuwe Ster', this)">⭐ De Nieuwe Ster</button>
-                    <button class="pill" onclick="setNewsFilter('De Limburger', this)">📰 De Limburger</button>
-                </div>
-
-                <div id="agendaFilters" class="pill-row" style="display:none;">
-                    <button class="pill active-pill-agenda" onclick="setAgendaFilter('alles', this)">📅 Alles</button>
-                    <button class="pill" onclick="setAgendaFilter('vandaag', this)">⚡ Vandaag</button>
-                    <button class="pill" onclick="setAgendaFilter('weekend', this)">🥂 Weekend</button>
-                    <button class="pill" onclick="setAgendaFilter('Verenigingen', this)">🎺 Verenigingen</button>
-                    <button class="pill" onclick="setAgendaFilter('Eijsden-Margraten', this)">🌳 Regio</button>
-                </div>
-            </div>
-        </header>
-
-        <!-- Content -->
-        <div id="newsList" class="content-wrap"></div>
-        <div id="agendaList" class="content-wrap" style="display:none;"></div>
-
-        <!-- In-app viewer -->
-        <div id="iframeContainer">
-            <div class="iframe-toolbar">
-                <button class="btn-close-viewer" onclick="closeViewer()">✕ Sluiten</button>
-                <div id="frameTitle" style="font-size:12px; font-weight:800; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:60%;">Laden...</div>
-                <a id="frameExt" href="#" target="_blank" rel="noopener noreferrer" style="color:var(--gold); font-size:11px; text-decoration:none; font-weight:bold;">Chrome ↗</a>
-            </div>
-            <iframe id="inAppFrame" src="about:blank"></iframe>
-        </div>
-
-        <!-- Bottom Bar -->
-        <nav class="bottom-bar">
-            <button id="navNews" class="nav-btn active" onclick="setTab('nieuws'); setNewsFilter('alles')">
-                <span style="font-size:17px;">📰</span>
-                <span>Nuijts</span>
-            </button>
-            <button id="navAgenda" class="nav-btn" onclick="setTab('agenda')">
-                <span style="font-size:17px;">📒</span>
-                <span>Callepin</span>
-            </button>
-            <button class="nav-btn" onclick="setTab('nieuws'); setNewsFilter('Vermist dier')">
-                <span style="font-size:17px;">🐾</span>
-                <span>Diere</span>
-            </button>
-            <button class="nav-btn" style="color:#ef4444;" onclick="openViewer('https://www.stadindex.nl/112/maastricht', '🚨 112 Maastricht')">
-                <span style="font-size:17px;">🚨</span>
-                <span>112 Melding</span>
-            </button>
-        </nav>
-    </div>
-
-    <script>
-        // Fallback data indien offline
-        let currentArticles = [
-            {
-                id: 1,
-                title: "🐾 Dierenbescherming Limburg: Vermiste dieren rondom Maastricht",
-                source: "Mijn Dier Is Zoek",
-                url: "https://mijndieriszoek.dierenbescherming.nl/vermiste-dieren/honden?location=Maastricht",
-                category: "Vermist dier",
-                time: "Live overzicht",
-                image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=700&q=80",
-                snippet: "Actuele meldingen van vermiste en gesignaleerde honden en katten in regio Maastricht.",
-                locationTag: "Maastricht e.o."
-            },
-            {
-                id: 2,
-                title: "Wat is loos in Mestreech: Kettingbotsing met drie voertuigen op A2",
-                source: "Wat is loos in Mestreech",
-                url: "https://watisloos.nl/",
-                category: "Wat is loos",
-                time: "Recent gemeld",
-                image: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=700&q=80",
-                snippet: "Snelweg tijdelijk afgesloten na zware aanrijding tussen meerdere wagens.",
-                locationTag: "A2 Maastricht"
-            },
-            {
-                id: 3,
-                title: "De Nieuwe Ster: Ondernemers Wyck bezorgd over bereikbaarheid",
-                source: "De Nieuwe Ster",
-                url: "https://www.denieuwestermaastricht.nl/",
-                category: "De Nieuwe Ster",
-                time: "Vandaag",
-                image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80",
-                snippet: "Winkeliers en horeca in de Rechtstraat vrezen omzetverlies door venstertijden.",
-                locationTag: "Wyck"
-            }
-        ];
-
-        const agendaData = [
-            {
-                id: 101,
-                title: "Live Jazz op de Markt & Terrassen",
-                location: "Markt & Jekerkwartier Maastricht",
-                timeLabel: "Vandaag • 19:30 uur",
-                period: "vandaag",
-                regionTag: "Maastricht",
-                price: "Gratis toegang",
-                image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=700&q=80",
-                snippet: "Sfeervol terrasconcert met lokale Maastrichtse muzikanten.",
-                url: "https://www.bezoekmaastricht.nl/uitagenda"
-            },
-            {
-                id: 102,
-                title: "Riemst (BE): Geheimen van Mergelgrotten Kanne",
-                location: "Avergat 14, Kanne (Riemst)",
-                timeLabel: "Weekend • 20:30 uur",
-                period: "weekend",
-                regionTag: "Riemst",
-                price: "€ 14,00",
-                image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80",
-                snippet: "Spectaculaire avondrondleiding bij kaarslicht net over de grens.",
-                url: "https://www.riemst.be"
-            }
-        ];
-
-        let currentTab = 'nieuws';
-        let currentNewsFilter = 'alles';
-        let currentAgendaFilter = 'alles';
-
-        // Probeer live news_data.json op te halen
-        async function loadLiveData() {
-            try {
-                const res = await fetch('news_data.json');
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.length > 0) {
-                        currentArticles = data;
-                        renderNews();
-                    }
-                }
-            } catch (e) {
-                console.log("Gebruikt lokale artikelen (offline mode)");
-            }
-        }
-
-        function renderNews() {
-            const listEl = document.getElementById('newsList');
-            let filtered = currentArticles.filter(item => {
-                return (currentNewsFilter === 'alles') || (item.category === currentNewsFilter);
-            });
-
-            let html = '';
-            filtered.forEach(it => {
-                const isAnimal = it.category === 'Vermist dier';
-                const isSter = it.source === 'De Nieuwe Ster';
-                let badgeClass = isAnimal ? 'animal' : (isSter ? 'stare' : '');
-
-                html += `
-                    <div class="feed-card" onclick="openViewer('${it.url}', '${it.title.replace(/'/g, "")}')">
-                        <div class="card-img-wrap">
-                            <img src="${it.image}" alt="" loading="lazy">
-                            <div class="card-img-overlay">
-                                <span class="badge ${badgeClass}">${it.source}</span>
-                            </div>
-                            <span class="card-img-time">🕒 ${it.time}</span>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-title">${it.title}</div>
-                            <div class="card-snippet">${it.snippet}</div>
-                            <div class="card-footer">
-                                <span>📍 ${it.locationTag || 'Maastricht'}</span>
-                                <button class="btn-share" onclick="shareItem(event, '${it.title.replace(/'/g, "")}', '${it.url}')">Delen ➦</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            listEl.innerHTML = html;
-        }
-
-        function renderAgenda() {
-            const listEl = document.getElementById('agendaList');
-            let filtered = agendaData.filter(item => {
-                if (currentAgendaFilter === 'alles') return true;
-                return item.period === currentAgendaFilter || item.regionTag === currentAgendaFilter;
-            });
-
-            let html = '';
-            filtered.forEach(it => {
-                html += `
-                    <div class="feed-card" onclick="openViewer('${it.url}', '${it.title.replace(/'/g, "")}')">
-                        <div class="card-img-wrap">
-                            <img src="${it.image}" alt="" loading="lazy">
-                            <div class="card-img-overlay">
-                                <span class="badge">${it.regionTag}</span>
-                            </div>
-                            <span class="card-img-time" style="color:var(--gold); font-weight:800;">${it.price}</span>
-                        </div>
-                        <div class="card-body">
-                            <div class="card-title">${it.title}</div>
-                            <div style="font-size:12px; color:var(--gold); font-weight:800; margin-bottom:4px;">🕒 ${it.timeLabel}</div>
-                            <div class="card-snippet">${it.snippet}</div>
-                            <div class="card-footer">
-                                <span>📍 ${it.location}</span>
-                                <button class="btn-share" onclick="shareItem(event, '${it.title.replace(/'/g, "")}', '${it.url}')">Delen ➦</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            listEl.innerHTML = html;
-        }
-
-        function shareItem(event, title, url) {
-            event.stopPropagation();
-            if (navigator.share) {
-                navigator.share({ title: title, text: `${title}\n`, url: url }).catch(() => {});
-            } else {
-                navigator.clipboard.writeText(`${title} - ${url}`);
-                alert("Link gekopieerd!");
-            }
-        }
-
-        function openViewer(url, title) {
-            const container = document.getElementById('iframeContainer');
-            const frame = document.getElementById('inAppFrame');
-            document.getElementById('frameTitle').textContent = title || "Bericht";
-            document.getElementById('frameExt').href = url;
-            frame.src = url;
-            container.className = 'open';
-        }
-
-        function closeViewer() {
-            document.getElementById('iframeContainer').className = '';
-            document.getElementById('inAppFrame').src = 'about:blank';
-        }
-
-        function setTab(tab) {
-            currentTab = tab;
-            document.getElementById('newsList').style.display = tab === 'nieuws' ? 'flex' : 'none';
-            document.getElementById('agendaList').style.display = tab === 'agenda' ? 'flex' : 'none';
-            document.getElementById('newsFilters').style.display = tab === 'nieuws' ? 'flex' : 'none';
-            document.getElementById('agendaFilters').style.display = tab === 'agenda' ? 'flex' : 'none';
-            document.getElementById('btnTabNews').className = tab === 'nieuws' ? 'tab-btn active-news' : 'tab-btn';
-            document.getElementById('btnTabAgenda').className = tab === 'agenda' ? 'tab-btn active-agenda' : 'tab-btn';
-            document.getElementById('navNews').className = tab === 'nieuws' ? 'nav-btn active' : 'nav-btn';
-            document.getElementById('navAgenda').className = tab === 'agenda' ? 'nav-btn active-gold' : 'nav-btn';
-            if (tab === 'nieuws') renderNews(); else renderAgenda();
-        }
-
-        function setNewsFilter(cat, btn) {
-            currentNewsFilter = cat;
-            document.querySelectorAll('#newsFilters .pill').forEach(p => {
-                p.className = (p.textContent.includes(cat) || (cat === 'alles' && p.textContent.includes('Alles'))) ? 'pill active-pill-news' : 'pill';
-            });
-            renderNews();
-        }
-
-        function setAgendaFilter(period, btn) {
-            currentAgendaFilter = period;
-            document.querySelectorAll('#agendaFilters .pill').forEach(p => p.className = 'pill');
-            if (btn) btn.className = 'pill active-pill-agenda';
-            renderAgenda();
-        }
-
-        // Starten
-        renderNews();
-        loadLiveData();
-    </script>
+​<div id="app">
+<!-- Zoekvenster Overlay -->
+<div id="searchOverlay">
+<div class="search-inner">
+<input type="text" id="popupSearchInput" placeholder="Zoek op buurt (Wyck, Malberg), dier of onderwerp..." oninput="onSearchChange(this.value)">
+<button onclick="closeSearch()">✕ Sluiten</button>
+</div>
+</div>
+​<!-- Header -->
+<header>
+<div class="header-flag-bg">
+<svg class="flag-star-svg" viewBox="0 0 51 48">
+<path d="m25.5 0 7.88 15.96 17.62 2.56-12.75 12.43 3.01 17.55-15.76-8.29-15.76 8.29 3.01-17.55-12.75-12.43 17.62-2.56z"/>
+</svg>
+<div class="flag-folds-overlay"></div>
+</div>
+<div class="header-dark-tint"></div>
+​<div class="header-content">
+<div class="header-top">
+<div>
+<div style="font-size:20px; font-weight:900; letter-spacing:-0.3px; color:#fff; text-shadow:0 2px 4px rgba(0,0,0,0.6);">
+Mestreech Vendaog
+</div>
+<div style="font-size:10px; color:#e2e8f0; font-weight:600;">
+Stad, Buurten & Grensregio
+</div>
+</div>
+​<div class="live-status-pill" onclick="refreshLiveData()" title="Tik om te verversen">
+<span class="dot-pulse"></span>
+<span id="liveStatusText">Live feed</span>
+</div>
+</div>
+​<!-- Tabs -->
+<div class="tab-box">
+<button id="btnTabNews" class="tab-btn active-news" onclick="setTab('nieuws')">📰 Mestreechs Nuijts</button>
+<button id="btnTabAgenda" class="tab-btn" onclick="setTab('agenda')">📒 Callepin</button>
+</div>
+​<!-- Handige filters bij breedbeeld / landscape (automatisch verborgen op staande schermen) -->
+<div id="newsFilters" class="pill-row landscape-visible">
+<button class="pill active-pill-news" onclick="setNewsFilter('alles', this)">🔥 Alles</button>
+<button class="pill" onclick="setNewsFilter('Wat is loos', this)">⚡ Wat is Loos</button>
+<button class="pill" onclick="setNewsFilter('De Nieuwe Ster', this)">⭐ De Nieuwe Ster</button>
+<button class="pill" onclick="setNewsFilter('Vermist dier', this)">🐾 Diere</button>
+</div>
+</div>
+</header>
+​<!-- Feed Lijsten -->
+<div id="newsList" class="content-wrap"></div>
+<div id="agendaList" class="content-wrap" style="display:none;"></div>
+​<!-- In-App Viewer -->
+<div id="iframeContainer">
+<div class="iframe-toolbar">
+<button class="btn-close-viewer" onclick="closeViewer()">✕ Sluiten</button>
+<div id="frameTitle" style="font-size:12px; font-weight:800; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:60%;">Laden...</div>
+<a id="frameExt" href="#" target="_blank" rel="noopener noreferrer" style="color:var(--gold); font-size:11px; text-decoration:none; font-weight:bold;">Chrome ↗</a>
+</div>
+<iframe id="inAppFrame" src="about:blank"></iframe>
+</div>
+​<!-- Bottom Bar: Nuijts, Callepin, Zoeken, Diere & 112 Melding -->
+<nav class="bottom-bar">
+<button id="navNews" class="nav-btn active" onclick="setTab('nieuws')">
+<span style="font-size:17px;">📰</span>
+<span>Nuijts</span>
+</button>
+<button id="navAgenda" class="nav-btn" onclick="setTab('agenda')">
+<span style="font-size:17px;">📒</span>
+<span>Callepin</span>
+</button>
+<!-- Zoekknop terug in het midden! -->
+<button class="nav-btn" onclick="toggleSearch()" title="Zoeken">
+<span style="font-size:17px;">🔍</span>
+<span>Zoeken</span>
+</button>
+<button class="nav-btn" style="color:#14b8a6;" onclick="openAnimalSection()">
+<span style="font-size:17px;">🐾</span>
+<span>Diere</span>
+</button>
+<button class="nav-btn" style="color:#ef4444;" onclick="openViewer('https://www.stadindex.nl/112/maastricht', '🚨 112 Maastricht')">
+<span style="font-size:17px;">🚨</span>
+<span>112 Melding</span>
+</button>
+</nav>
+</div>
+​<script>
+// GitHub Raw URL van jouw repository voor automatische online live updates
+const ONLINE_DATA_URL = 'https://raw.githubusercontent.com/guidohaesen/mestreech-vendaog/main/www/news_data.json';
+​// Directe opstart-artikelen
+let articles = [
+{
+id: "ster-1",
+title: "De Nieuwe Ster: Ondernemers Wyck bezorgd over bereikbaarheid en venstertijden",
+source: "De Nieuwe Ster",
+url: "https://www.denieuwestermaastricht.nl/",
+category: "De Nieuwe Ster",
+time: "Vandaag",
+image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80",
+snippet: "Winkeliers en horeca in de Rechtstraat trekken aan de bel. De Nieuwe Ster peilde de reacties in het stadsdeel.",
+locationTag: "Wyck"
+},
+{
+id: "loos-1",
+title: "Wat is loos: Kettingbotsing met drie voertuigen op A2 richting Eindhoven",
+source: "Wat is loos in Mestreech",
+url: "https://watisloos.nl/",
+category: "Wat is loos",
+time: "Recent gemeld",
+image: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=700&q=80",
+snippet: "Snelweg tijdelijk afgesloten na aanrijding tussen meerdere wagens. Hulpdiensten ter plaatse.",
+locationTag: "A2 Maastricht"
+},
+{
+id: "animal-1",
+title: "🐾 Dierenbescherming Limburg: Vermiste en gevonden dieren rondom Maastricht",
+source: "Mijn Dier Is Zoek",
+url: "https://mijndieriszoek.dierenbescherming.nl/vermiste-dieren/honden?location=Maastricht",
+category: "Vermist dier",
+time: "Live overzicht",
+image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=700&q=80",
+snippet: "Bekijk de actuele dossiers van vermiste honden, katten en zwerfdieren in Maastricht en Mergelland.",
+locationTag: "Maastricht e.o."
+}
+];
+​const agendaData = [
+{
+id: 101,
+title: "Live Jazz op de Markt & Jekerterras",
+location: "Markt & Jekerkwartier Maastricht",
+timeLabel: "Vandaag • 19:30 uur",
+price: "Gratis toegang",
+image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=700&q=80",
+snippet: "Gezellig terrasconcert met lokale Maastrichtse jazzmuzikanten.",
+url: "https://www.bezoekmaastricht.nl/uitagenda"
+},
+{
+id: 102,
+title: "Riemst (BE): Geheimen van Mergelgrotten Kanne",
+location: "Avergat 14, Kanne (Riemst)",
+timeLabel: "Dit Weekend • 20:30 uur",
+price: "€ 14,00",
+image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80",
+snippet: "Spectaculaire avondrondleiding bij kaarslicht net over de grens bij Maastricht.",
+url: "https://www.riemst.be"
+},
+{
+id: 103,
+title: "Koninklijke Harmonie Sainte Cécile Eijsden: Zomerconcert",
+location: "Vroenhof, Eijsden",
+timeLabel: "Morgen • 19:45 uur",
+price: "Vrije bijdrage",
+image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=700&q=80",
+snippet: "Openluchtconcert met marsen en filmmuziek van 't Rood van Eijsden.",
+url: "https://www.visiteijsdenmargraten.nl/"
+}
+];
+​let currentTab = 'nieuws';
+let currentFilter = 'alles';
+let searchQuery = '';
+​/* Haalt LIVE het nieuws op van GitHub (zonder nieuwe APK nodig te hebben!) */
+async function fetchLiveNews() {
+const statusEl = document.getElementById('liveStatusText');
+statusEl.textContent = 'Verversen...';
+try {
+// Voeg een timestamp toe om cache te omzeilen
+const res = await fetch(${ONLINE_DATA_URL}?t=${Date.now()});
+if (res.ok) {
+const data = await res.json();
+if (Array.isArray(data) && data.length > 0) {
+articles = data;
+renderNews();
+statusEl.textContent = 'Bijgewerkt';
+return;
+}
+}
+} catch (err) {
+// Als het online niet lukt, probeer het lokale bestand binnen de app
+try {
+const localRes = await fetch('news_data.json');
+if (localRes.ok) {
+const localData = await localRes.json();
+if (Array.isArray(localData) && localData.length > 0) {
+articles = localData;
+renderNews();
+}
+}
+} catch (e) {}
+}
+statusEl.textContent = 'Live feed';
+}
+​function refreshLiveData() {
+fetchLiveNews();
+}
+​function render() {
+if (currentTab === 'nieuws') renderNews();
+else renderAgenda();
+}
+​function renderNews() {
+const listEl = document.getElementById('newsList');
+const q = searchQuery.toLowerCase();
+​let filtered = articles.filter(it => {
+const matchCategory = (currentFilter === 'alles') || (it.category === currentFilter);
+const matchSearch = !q || it.title.toLowerCase().includes(q) || it.snippet.toLowerCase().includes(q) || (it.locationTag && it.locationTag.toLowerCase().includes(q));
+return matchCategory && matchSearch;
+});
+​if (filtered.length === 0) {
+listEl.innerHTML = '<div style="text-align:center; padding:50px 10px; color:#64748b;">Geen berichten gevonden.</div>';
+return;
+}
+​let html = '';
+filtered.forEach(it => {
+const isAnimal = it.category === 'Vermist dier';
+const isLoos = it.source && it.source.includes('Wat is loos');
+const isSter = it.source && it.source.includes('Nieuwe Ster');
+​let badgeClass = '';
+if (isAnimal) badgeClass = 'animal';
+else if (isLoos) badgeClass = 'loos';
+else if (isSter) badgeClass = 'stare';
+​html += <div class="feed-card" onclick="openViewer('${it.url}', '${escapeHtml(it.title)}')"> <div class="card-img-wrap"> <img src="${it.image}" alt="" loading="lazy"> <div class="card-img-overlay"> <span class="badge ${badgeClass}">${it.source}</span> </div> <span class="card-img-time">🕒 ${it.time}</span> </div> <div class="card-body"> <div class="card-title">${it.title}</div> <div class="card-snippet">${it.snippet}</div> <div class="card-footer"> <span>📍 ${it.locationTag || 'Maastricht'}</span> <button class="btn-share" onclick="shareItem(event, '${escapeHtml(it.title)}', '${it.url}')">Delen ➦</button> </div> </div> </div>;
+});
+listEl.innerHTML = html;
+}
+​function renderAgenda() {
+const listEl = document.getElementById('agendaList');
+const q = searchQuery.toLowerCase();
+​let filtered = agendaData.filter(it => {
+return !q || it.title.toLowerCase().includes(q) || it.location.toLowerCase().includes(q) || it.snippet.toLowerCase().includes(q);
+});
+​if (filtered.length === 0) {
+listEl.innerHTML = '<div style="text-align:center; padding:50px 10px; color:#64748b;">Geen agendapunten gevonden.</div>';
+return;
+}
+​let html = '';
+filtered.forEach(it => {
+html += <div class="feed-card" onclick="openViewer('${it.url}', '${escapeHtml(it.title)}')"> <div class="card-img-wrap"> <img src="${it.image}" alt="" loading="lazy"> <span class="card-img-time" style="color:var(--gold); font-weight:800;">${it.price}</span> </div> <div class="card-body"> <div class="card-title">${it.title}</div> <div style="font-size:12px; color:var(--gold); font-weight:800; margin-bottom:4px;">🕒 ${it.timeLabel}</div> <div class="card-snippet">${it.snippet}</div> <div class="card-footer"> <span>📍 ${it.location}</span> <button class="btn-share" onclick="shareItem(event, '${escapeHtml(it.title)}', '${it.url}')">Delen ➦</button> </div> </div> </div>;
+});
+listEl.innerHTML = html;
+}
+​/* Zoekfunctie */
+function toggleSearch() {
+const overlay = document.getElementById('searchOverlay');
+const input = document.getElementById('popupSearchInput');
+if (overlay.classList.contains('open')) {
+closeSearch();
+} else {
+overlay.classList.add('open');
+input.focus();
+}
+}
+​function closeSearch() {
+document.getElementById('searchOverlay').classList.remove('open');
+searchQuery = '';
+document.getElementById('popupSearchInput').value = '';
+render();
+}
+​function onSearchChange(val) {
+searchQuery = val;
+render();
+}
+​/* Tabs en Filters */
+function setTab(tab) {
+currentTab = tab;
+document.getElementById('newsList').style.display = tab === 'nieuws' ? 'flex' : 'none';
+document.getElementById('agendaList').style.display = tab === 'agenda' ? 'flex' : 'none';
+document.getElementById('btnTabNews').className = tab === 'nieuws' ? 'tab-btn active-news' : 'tab-btn';
+document.getElementById('btnTabAgenda').className = tab === 'agenda' ? 'tab-btn active-agenda' : 'tab-btn';
+document.getElementById('navNews').className = tab === 'nieuws' ? 'nav-btn active' : 'nav-btn';
+document.getElementById('navAgenda').className = tab === 'agenda' ? 'nav-btn active-gold' : 'nav-btn';
+render();
+}
+​function openAnimalSection() {
+setTab('nieuws');
+currentFilter = 'Vermist dier';
+renderNews();
+}
+​function setNewsFilter(cat, btn) {
+currentFilter = cat;
+document.querySelectorAll('#newsFilters .pill').forEach(p => p.classList.remove('active-pill-news'));
+if (btn) btn.classList.add('active-pill-news');
+renderNews();
+}
+​/* Delen en Viewer */
+function shareItem(event, title, url) {
+event.stopPropagation();
+if (navigator.share) {
+navigator.share({ title: title, text: ${title}\n, url: url }).catch(() => {});
+} else {
+navigator.clipboard.writeText(${title} - ${url});
+alert("Link gekopieerd naar klembord!");
+}
+}
+​function openViewer(url, title) {
+const container = document.getElementById('iframeContainer');
+const frame = document.getElementById('inAppFrame');
+document.getElementById('frameTitle').textContent = title || "Bericht";
+document.getElementById('frameExt').href = url;
+frame.src = url;
+container.className = 'open';
+}
+​function closeViewer() {
+document.getElementById('iframeContainer').className = '';
+document.getElementById('inAppFrame').src = 'about:blank';
+}
+​function escapeHtml(str) {
+return (str || '').replace(/'/g, "\'").replace(/"/g, '"');
+}
+​// Direct renderen en live data binnenhalen
+render();
+fetchLiveNews();
+</script>
 </body>
 </html>
