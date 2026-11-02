@@ -1,0 +1,35 @@
+[
+  {
+    "id": "animal-1",
+    "title": "🐾 Dierenbescherming Limburg: Vermiste dieren rondom Maastricht",
+    "source": "Mijn Dier Is Zoek",
+    "url": "https://mijndieriszoek.dierenbescherming.nl/vermiste-dieren/honden?location=Maastricht",
+    "category": "Vermist dier",
+    "time": "Live overzicht",
+    "image": "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=700&q=80",
+    "snippet": "Actuele meldingen van vermiste en gesignaleerde honden en katten in regio Maastricht.",
+    "locationTag": "Maastricht e.o."
+  },
+  {
+    "id": "loos-1",
+    "title": "Wat is loos: Kettingbotsing met drie voertuigen op A2 richting Eindhoven",
+    "source": "Wat is loos in Mestreech",
+    "url": "https://watisloos.nl/",
+    "category": "Wat is loos",
+    "time": "Recent gemeld",
+    "image": "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=700&q=80",
+    "snippet": "Snelweg tijdelijk afgesloten na aanrijding tussen meerdere wagens.",
+    "locationTag": "A2 Maastricht"
+  },
+  {
+    "id": "ster-1",
+    "title": "De Nieuwe Ster: Ondernemers Wyck bezorgd over bereikbaarheid",
+    "source": "De Nieuwe Ster",
+    "url": "https://www.denieuwestermaastricht.nl/",
+    "category": "De Nieuwe Ster",
+    "time": "Vandaag",
+    "image": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80",
+    "snippet": "Winkeliers en horeca in de Rechtstraat vrezen omzetverlies door venstertijden.",
+    "locationTag": "Wyck"
+  }
+]
