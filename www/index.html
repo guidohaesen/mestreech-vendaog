@@ -1,218 +1,1184 @@
-<!DOCTYPE html> <html lang="nl"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <title>Mestreech Vendaog</title> <style> * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-
-:root { --red: #C8102E; --dark-red: #8B0000; --gold: #FFC72C; --bg: #070b12; --card: #111a2c; --border: rgba(255, 255, 255, 0.12); --text: #f8fafc; --sub: #94a3b8; --loos-orange: #ff6b00; --alert-red: #ef4444; --animal-teal: #14b8a6; }
-
-body { background-color: #000000; color: var(--text); display: flex; justify-content: center; min-height: 100vh; }
-
-#app { width: 100%; max-width: 480px; min-height: 100vh; background-color: var(--bg); display: flex; flex-direction: column; position: relative; box-shadow: 0 0 35px rgba(0,0,0,0.85); }
-
-/* Pop-up Melding (Toast) */ #toast { position: fixed; top: 14px; left: 50%; transform: translateX(-50%) translateY(-240%); width: calc(100% - 28px); max-width: 440px; background-color: rgba(21, 31, 50, 0.95); backdrop-filter: blur(10px); border: 2px solid var(--red); border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; z-index: 99999; box-shadow: 0 10px 25px rgba(200, 16, 46, 0.55); transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275); cursor: pointer; } #toast.active { transform: translateX(-50%) translateY(0); } .toast-star { width: 36px; height: 36px; background: var(--red); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #ffffff; flex-shrink: 0; font-weight: bold; }
-
-/* HEADER MET WAPPERENDE MAASTRICHTSE VLAG OVER VOLLEDIGE BREEDTE */ header { position: sticky; top: 0; z-index: 40; border-bottom: 1px solid var(--border); padding: 14px 14px 10px; position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-
-/* Achtergrondvlag met golvend wappereffect en doekschaduwen */ .header-flag-bg { position: absolute; inset: -15px; z-index: 1; background-color: #ba0c2f; overflow: hidden; pointer-events: none; }
-
-/* De witte 5-puntige Maastrichtse ster op het doek */ .flag-star-svg { position: absolute; left: 12%; top: 50%; transform: translateY(-50%); width: 140px; height: 140px; fill: #ffffff; opacity: 0.88; filter: drop-shadow(2px 4px 10px rgba(0,0,0,0.45)); animation: flagWaveMotion 4s ease-in-out infinite alternate; }
-
-/* Golvende wapperende plooien & lichtinval over het doek */ .flag-folds-overlay { position: absolute; inset: 0; background: linear-gradient( 95deg, rgba(0,0,0,0.65) 0%, rgba(255,255,255,0.22) 20%, rgba(0,0,0,0.45) 45%, rgba(255,255,255,0.28) 68%, rgba(0,0,0,0.7) 100% ); background-size: 250% 100%; mix-blend-mode: overlay; animation: flagShimmer 4s ease-in-out infinite alternate; }
-
-/* Subtiele donkere verlooplaag voor optimale leesbaarheid */ .header-dark-tint { position: absolute; inset: 0; z-index: 2; background: linear-gradient(180deg, rgba(8, 12, 20, 0.55) 0%, rgba(8, 12, 20, 0.82) 100%); pointer-events: none; }
-
-.header-content { position: relative; z-index: 3; }
-
-@keyframes flagWaveMotion { 0% { transform: translateY(-50%) rotate(0deg) skewX(0deg) scale(1); } 50% { transform: translateY(-48%) rotate(1.8deg) skewX(2deg) scale(1.02); } 100% { transform: translateY(-52%) rotate(-1.5deg) skewX(-1.5deg) scale(0.98); } }
-
-@keyframes flagShimmer { 0% { background-position: 0% 0%; } 100% { background-position: 100% 0%; } }
-
-.header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-
-.logo-title-group { display: flex; align-items: center; gap: 10px; }
-
-.header-badge { width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.2); border: 1.5px solid rgba(255, 255, 255, 0.4); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #ffffff; backdrop-filter: blur(8px); box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
-
-.btn-bell { width: 36px; height: 36px; border-radius: 50%; background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.3); color: #ffffff; font-size: 16px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.25); }
-
-/* LICHT TRANSPARANTE FROSTED-GLASS BUTTONS EN TABS */ .tab-box { display: grid; grid-template-columns: 1fr 1fr; background: rgba(0, 0, 0, 0.35); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 12px; padding: 3px; margin-bottom: 9px; }
-
-.tab-btn { background: transparent; border: none; color: #e2e8f0; padding: 9px 0; font-size: 12px; font-weight: 800; border-radius: 9px; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s ease; } .tab-btn.active-news { background: rgba(200, 16, 46, 0.85); color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.35); } .tab-btn.active-agenda { background: rgba(255, 199, 44, 0.9); color: #090d16; font-weight: 900; box-shadow: 0 2px 8px rgba(0,0,0,0.35); }
-
-/* Horizontale scrolbare filterbalk (Frosted glass) */ .pill-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; } .pill-row::-webkit-scrollbar { display: none; }
-
-.pill { flex-shrink: 0; background: rgba(15, 23, 42, 0.45); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); color: #cbd5e1; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; transition: all 0.15s ease; } .pill.active-pill-news { background: rgba(200, 16, 46, 0.9); border-color: rgba(255, 255, 255, 0.4); color: #ffffff; } .pill.active-pill-agenda { background: rgba(255, 199, 44, 0.92); border-color: rgba(255, 199, 44, 0.9); color: #090d16; font-weight: 900; }
-
-/* Zoekglas pop-up venster */ #searchOverlay { display: none; position: fixed; top: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background-color: rgba(15, 23, 42, 0.96); backdrop-filter: blur(16px); border-bottom: 2px solid var(--gold); padding: 12px 14px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.8); } #searchOverlay.open { display: block; animation: slideDown 0.2s ease-out; } @keyframes slideDown { from { transform: translateX(-50%) translateY(-100%); } to { transform: translateX(-50%) translateY(0); } }
-
-.search-inner { display: flex; gap: 10px; align-items: center; } .search-inner input { flex: 1; background-color: #1e293b; border: 1px solid var(--border); border-radius: 10px; padding: 9px 12px; color: #fff; font-size: 13px; outline: none; } .search-inner button { background: #334155; color: #fff; border: none; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: bold; cursor: pointer; }
-
-#activeSearchBadge { display: none; margin: 8px 14px 0; background: rgba(255, 199, 44, 0.15); border: 1px solid var(--gold); border-radius: 8px; padding: 6px 10px; font-size: 11px; color: var(--gold); align-items: center; justify-content: space-between; }
-
-/* Content feed */ .content-wrap { flex: 1; padding: 12px 14px 85px; display: flex; flex-direction: column; gap: 14px; }
-
-.feed-card { background-color: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: transform 0.15s ease, border-color 0.2s ease; } .feed-card:active { transform: scale(0.985); } .feed-card.loos-border { border-color: rgba(255, 107, 0, 0.5); } .feed-card.stare-border { border-color: rgba(255, 199, 44, 0.5); } .feed-card.animal-border { border-color: rgba(20, 184, 166, 0.6); }
-
-.card-img-wrap { width: 100%; height: 160px; position: relative; background-color: #1a2436; } .card-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-.card-img-overlay { position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; }
-
-.card-img-time { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.75); color: #f1f5f9; font-size: 10px; font-weight: 700; padding: 3px 7px; border-radius: 6px; backdrop-filter: blur(4px); }
-
-.card-body { padding: 12px 14px 14px; }
-
-.card-title { font-size: 15px; font-weight: 800; color: #ffffff; line-height: 1.35; margin-bottom: 6px; }
-
-.card-snippet { font-size: 12px; color: #94a3b8; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
-
-.card-footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--gold); font-weight: 700; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 8px; }
-
-.btn-share { background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #cbd5e1; padding: 4px 9px; border-radius: 8px; font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 4px; cursor: pointer; } .btn-share:active { background: var(--gold); color: #090d16; }
-
-.badge { font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; background-color: rgba(200, 16, 46, 0.85); color: #fff; backdrop-filter: blur(4px); } .badge.loos { background-color: rgba(255, 107, 0, 0.9); } .badge.stare { background-color: rgba(255, 199, 44, 0.9); color: #000; font-weight: 900; } .badge.animal { background-color: rgba(20, 184, 166, 0.9); } .badge.region { background-color: rgba(56, 189, 248, 0.85); color: #042f2e; font-weight: 900; } .badge.vereniging { background-color: rgba(168, 85, 247, 0.85); }
-
-/* INLINE FRAME VIEWER MET AUTOMATISCHE BLOKKADE DETECTIE */ #iframeContainer { position: fixed; inset: 0; background-color: #070b12; z-index: 100000; display: none; flex-direction: column; } #iframeContainer.open { display: flex; }
-
-.iframe-toolbar { background-color: #111a2c; border-bottom: 1px solid var(--border); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-
-.iframe-info { flex: 1; min-width: 0; }
-
-.iframe-title { font-size: 12px; font-weight: 800; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-.iframe-url { font-size: 10px; color: var(--gold); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-.btn-toolbar { padding: 7px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; cursor: pointer; border: none; }
-
-.btn-close-viewer { background-color: var(--red); color: #fff; }
-
-.btn-ext-link { background-color: #1e293b; color: #cbd5e1; border: 1px solid var(--border); text-decoration: none; display: flex; align-items: center; gap: 3px; }
-
-.iframe-wrap { position: relative; flex: 1; width: 100%; background-color: #ffffff; }
-
-#inAppFrame { width: 100%; height: 100%; border: none; }
-
-/* Fallback wanneer een externe website insluiting in een frame weigert (ERR_BLOCKED_BY_RESPONSE) */ #iframeFallbackBox { position: absolute; inset: 0; background-color: #0b1220; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; z-index: 10; }
-
-/* Bottom Bar */ .bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background-color: rgba(7, 11, 18, 0.92); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 9px 0; z-index: 50; } .nav-btn { background: none; border: none; color: var(--sub); font-size: 11px; font-weight: 700; display: flex; flex-direction: column; align-items: center; gap: 3px; cursor: pointer; } .nav-btn.active { color: var(--red); } .nav-btn.active-gold { color: var(--gold); } .nav-btn.animal { color: var(--animal-teal); font-weight: 800; } .nav-btn.alert { color: var(--alert-red); font-weight: 800; } </style> </head> <body>
-
-<div id="app">
-
-<!-- Pop-up Melding (Toast) --> <div id="toast" onclick="hideToast()"> <div class="toast-star">★</div> <div style="flex:1; min-width:0;"> <div id="toastSub" style="font-size:9px; font-weight:900; color:var(--red); text-transform:uppercase;">Mestreech Breaking</div> <div id="toastTitle" style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Nieuwsflits</div> <div id="toastBody" style="font-size:11px; color:#cbd5e1;">Tik om direct in-app te bekijken</div> </div> </div>
-
-<!-- Uitklapbaar Zoekvenster --> <div id="searchOverlay"> <div class="search-inner"> <input type="text" id="popupSearchInput" placeholder="Zoek op buurt (Wyck, Scharn), dier of trefwoord..." oninput="onSearchChange(this.value)"> <button onclick="closeSearch()">✕ Sluiten</button> </div> </div>
-
-<!-- HEADER MET DE WAPPERENDE MAASTRICHTSE VLAG OVER DE BREEDTE --> <header> <!-- Wapperende Maastrichtse vlag achtergrond --> <div class="header-flag-bg"> <svg class="flag-star-svg" viewBox="0 0 51 48"> <path d="m25.5 0 7.88 15.96 17.62 2.56-12.75 12.43 3.01 17.55-15.76-8.29-15.76 8.29 3.01-17.55-12.75-12.43 17.62-2.56z"/> </svg> <div class="flag-folds-overlay"></div> </div> <div class="header-dark-tint"></div>
-
-<!-- Voorgrond content met semi-transparante styling --> <div class="header-content"> <div class="header-top"> <div class="logo-title-group"> <div class="header-badge">★</div> <div> <div style="font-size:20px; font-weight:900; letter-spacing:-0.3px; color:#fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"> Mestreech Vendaog </div> <div style="font-size:10px; color:#f1f5f9; display:flex; align-items:center; gap:5px; font-weight:600; text-shadow: 0 1px 2px rgba(0,0,0,0.5);"> <span style="width:7px; height:7px; border-radius:50%; background:#10b981; display:inline-block; box-shadow: 0 0 6px #10b981;"></span> Stad, Buurten & Grensregio </div> </div> </div>
-
-<button class="btn-bell" onclick="testNotification()" title="Test Melding"> 🔔 </button> </div>
-
-<!-- Licht transparante tab switcher --> <div class="tab-box"> <button id="btnTabNews" class="tab-btn active-news" onclick="setTab('nieuws')"> <span>📰</span> Mestreechs Nuijts </button> <button id="btnTabAgenda" class="tab-btn" onclick="setTab('agenda')"> <span>📒</span> Callepin </button> </div>
-
-<!-- Licht transparante scrolbare filters voor Nuijts --> <div id="newsFilters" class="pill-row"> <button class="pill active-pill-news" onclick="setNewsFilter('alles', this)">🔥 Alles</button> <button class="pill" onclick="setNewsFilter('Vermist dier', this)">🐾 Vermiste Diere</button> <button class="pill" onclick="setNewsFilter('Wat is loos', this)">⚡ Wat is Loos</button> <button class="pill" onclick="setNewsFilter('De Nieuwe Ster', this)">⭐ De Nieuwe Ster</button> <button class="pill" onclick="setNewsFilter('De Limburger', this)">📰 De Limburger</button> <button class="pill" onclick="setNewsFilter('L1 / RTV', this)">📻 L1 / RTV</button> <button class="pill" onclick="setNewsFilter('Socials', this)">💬 Socials (X/FB)</button> <button class="pill" onclick="setNewsFilter('Gemeente', this)">🏛️ Gemeente & 112</button> </div>
-
-<!-- Licht transparante scrolbare filters voor Callepin --> <div id="agendaFilters" class="pill-row" style="display:none;"> <button class="pill active-pill-agenda" onclick="setAgendaFilter('alles', this)">📅 Alles</button> <button class="pill" onclick="setAgendaFilter('vandaag', this)">⚡ Vandaag</button> <button class="pill" onclick="setAgendaFilter('morgen', this)">☀️ Morgen</button> <button class="pill" onclick="setAgendaFilter('weekend', this)">🥂 Dit Weekend</button> <button class="pill" onclick="setAgendaFilter('week', this)">🗓️ Komende Week</button> <button class="pill" onclick="setAgendaFilter('Verenigingen', this)">🎺 Verenigingen</button> <button class="pill" onclick="setAgendaFilter('Eijsden-Margraten', this)">🌳 Eijsden-Margraten</button> <button class="pill" onclick="setAgendaFilter('Meerssen', this)">⛪ Meerssen</button> <button class="pill" onclick="setAgendaFilter('Valkenburg', this)">🏰 Valkenburg</button> <button class="pill" onclick="setAgendaFilter('Lanaken', this)">🇧🇪 Lanaken</button> <button class="pill" onclick="setAgendaFilter('Riemst', this)">🇧🇪 Riemst</button> </div> </div> </header>
-
-<!-- Actieve zoekopdracht indicatie --> <div id="activeSearchBadge"> <span id="activeSearchText">Zoeken: ...</span> <span style="cursor:pointer; font-weight:bold; padding-left:8px;" onclick="resetSearch()">✕ Wis filter</span> </div>
-
-<!-- Content Lists --> <div id="newsList" class="content-wrap"></div> <div id="agendaList" class="content-wrap" style="display:none;"></div>
-
-<!-- In-App Inline Frame Viewer met slimme beveiligings-fallback --> <div id="iframeContainer"> <div class="iframe-toolbar"> <button class="btn-toolbar btn-close-viewer" onclick="closeInlineViewer()"> ✕ Sluiten </button> <div class="iframe-info"> <div id="frameTitle" class="iframe-title">Laden...</div> <div id="frameUrl" class="iframe-url">https://...</div> </div> <a id="frameExtLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-toolbar btn-ext-link" title="Open in Chrome"> Chrome ↗ </a> </div>
-
-<div class="iframe-wrap"> <iframe id="inAppFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
-
-<!-- Fallback scherm bij browser-blokkades zoals Amivedi --> <div id="iframeFallbackBox"> <div style="font-size:36px; margin-bottom:12px;">🛡️</div> <div style="font-size:16px; font-weight:800; color:#fff; margin-bottom:8px;"> Website beveiligt directe insluiting </div> <div style="font-size:12px; color:#94a3b8; max-width:320px; line-height:1.5; margin-bottom:20px;"> Deze externe site (zoals Amivedi) staat directe weergave binnen een inline frame niet toe via hun serverbeleid. Open de beveiligde pagina direct in Chrome op je Pixel: </div> <a id="fallbackOpenBtn" href="#" target="_blank" rel="noopener noreferrer" style="background:var(--red); color:#fff; font-weight:800; font-size:13px; padding:10px 20px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;"> Open direct in Chrome ↗ </a> </div> </div> </div>
-
-<!-- Bottom Bar: Nuijts, Callepin, Vermiste Dieren Maastricht, Zoeken & 112 --> <nav class="bottom-bar"> <!-- 1. Mestreechs Nuijts --> <button id="navNews" class="nav-btn active" onclick="setTab('nieuws'); setNewsFilter('alles')"> <span style="font-size:17px;">📰</span> <span>Nuijts</span> </button>
-
-<!-- 2. Callepin --> <button id="navAgenda" class="nav-btn" onclick="setTab('agenda')"> <span style="font-size:17px;">📒</span> <span>Callepin</span> </button>
-
-<!-- 3. Echte Dierenbescherming & Amivedi Maastricht e.o. filter --> <button class="nav-btn animal" onclick="openAnimalHub()" title="Vermiste Dieren Maastricht"> <span style="font-size:17px;">🐾</span> <span>Diere</span> </button>
-
-<!-- 4. Zoekglas --> <button class="nav-btn" onclick="openSearch()" title="Zoeken"> <span style="font-size:17px;">🔍</span> <span>Zoeken</span> </button>
-
-<!-- 5. 112 Maastricht direct naar Stadindex --> <button class="nav-btn alert" onclick="openInlineViewer('https://www.stadindex.nl/112/maastricht', '🚨 112 Meldingen Maastricht (P2000)')" title="112 Maastricht"> <span style="font-size:17px;">🚨</span> <span>112 Melding</span> </button> </nav>
-
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Mestreech Vendaog</title>
+<style>
+* {
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+-webkit-tap-highlight-color: transparent;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+​:root {
+--red: #C8102E;
+--dark-red: #8B0000;
+--gold: #FFC72C;
+--bg: #070b12;
+--card: #111a2c;
+--border: rgba(255, 255, 255, 0.12);
+--text: #f8fafc;
+--sub: #94a3b8;
+--loos-orange: #ff6b00;
+--alert-red: #ef4444;
+--animal-teal: #14b8a6;
+}
+​body {
+background-color: #000000;
+color: var(--text);
+display: flex;
+justify-content: center;
+min-height: 100vh;
+}
+​#app {
+width: 100%;
+max-width: 480px;
+min-height: 100vh;
+background-color: var(--bg);
+display: flex;
+flex-direction: column;
+position: relative;
+box-shadow: 0 0 35px rgba(0,0,0,0.85);
+}
+​/* Pop-up Melding (Toast) */
+#toast {
+position: fixed;
+top: 14px;
+left: 50%;
+transform: translateX(-50%) translateY(-240%);
+width: calc(100% - 28px);
+max-width: 440px;
+background-color: rgba(21, 31, 50, 0.95);
+backdrop-filter: blur(10px);
+border: 2px solid var(--red);
+border-radius: 14px;
+padding: 12px 14px;
+display: flex;
+align-items: center;
+gap: 12px;
+z-index: 99999;
+box-shadow: 0 10px 25px rgba(200, 16, 46, 0.55);
+transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+cursor: pointer;
+}
+#toast.active {
+transform: translateX(-50%) translateY(0);
+}
+.toast-star {
+width: 36px;
+height: 36px;
+background: var(--red);
+border-radius: 8px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 20px;
+color: #ffffff;
+flex-shrink: 0;
+font-weight: bold;
+}
+​/* HEADER MET WAPPERENDE MAASTRICHTSE VLAG OVER VOLLEDIGE BREEDTE */
+header {
+position: sticky;
+top: 0;
+z-index: 40;
+border-bottom: 1px solid var(--border);
+padding: 14px 14px 10px;
+position: relative;
+overflow: hidden;
+box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+​/* Achtergrondvlag met golvend wappereffect en doekschaduwen */
+.header-flag-bg {
+position: absolute;
+inset: -15px;
+z-index: 1;
+background-color: #ba0c2f;
+overflow: hidden;
+pointer-events: none;
+}
+​/* De witte 5-puntige Maastrichtse ster op het doek */
+.flag-star-svg {
+position: absolute;
+left: 12%;
+top: 50%;
+transform: translateY(-50%);
+width: 140px;
+height: 140px;
+fill: #ffffff;
+opacity: 0.88;
+filter: drop-shadow(2px 4px 10px rgba(0,0,0,0.45));
+animation: flagWaveMotion 4s ease-in-out infinite alternate;
+}
+​/* Golvende wapperende plooien & lichtinval over het doek */
+.flag-folds-overlay {
+position: absolute;
+inset: 0;
+background: linear-gradient(
+95deg,
+rgba(0,0,0,0.65) 0%,
+rgba(255,255,255,0.22) 20%,
+rgba(0,0,0,0.45) 45%,
+rgba(255,255,255,0.28) 68%,
+rgba(0,0,0,0.7) 100%
+);
+background-size: 250% 100%;
+mix-blend-mode: overlay;
+animation: flagShimmer 4s ease-in-out infinite alternate;
+}
+​/* Subtiele donkere verlooplaag voor optimale leesbaarheid */
+.header-dark-tint {
+position: absolute;
+inset: 0;
+z-index: 2;
+background: linear-gradient(180deg, rgba(8, 12, 20, 0.55) 0%, rgba(8, 12, 20, 0.82) 100%);
+pointer-events: none;
+}
+​.header-content {
+position: relative;
+z-index: 3;
+}
+​@keyframes flagWaveMotion {
+0% { transform: translateY(-50%) rotate(0deg) skewX(0deg) scale(1); }
+50% { transform: translateY(-48%) rotate(1.8deg) skewX(2deg) scale(1.02); }
+100% { transform: translateY(-52%) rotate(-1.5deg) skewX(-1.5deg) scale(0.98); }
+}
+​@keyframes flagShimmer {
+0% { background-position: 0% 0%; }
+100% { background-position: 100% 0%; }
+}
+​.header-top {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 12px;
+}
+​.logo-title-group {
+display: flex;
+align-items: center;
+gap: 10px;
+}
+​.header-badge {
+width: 36px;
+height: 36px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.2);
+border: 1.5px solid rgba(255, 255, 255, 0.4);
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+color: #ffffff;
+backdrop-filter: blur(8px);
+box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+​.btn-bell {
+width: 36px;
+height: 36px;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.15);
+backdrop-filter: blur(8px);
+border: 1px solid rgba(255, 255, 255, 0.3);
+color: #ffffff;
+font-size: 16px;
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+​/* LICHT TRANSPARANTE FROSTED-GLASS BUTTONS EN TABS */
+.tab-box {
+display: grid;
+grid-template-columns: 1fr 1fr;
+background: rgba(0, 0, 0, 0.35);
+backdrop-filter: blur(12px);
+-webkit-backdrop-filter: blur(12px);
+border: 1px solid rgba(255, 255, 255, 0.18);
+border-radius: 12px;
+padding: 3px;
+margin-bottom: 9px;
+}
+​.tab-btn {
+background: transparent;
+border: none;
+color: #e2e8f0;
+padding: 9px 0;
+font-size: 12px;
+font-weight: 800;
+border-radius: 9px;
+cursor: pointer;
+text-align: center;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 6px;
+transition: all 0.2s ease;
+}
+.tab-btn.active-news {
+background: rgba(200, 16, 46, 0.85);
+color: #ffffff;
+box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+.tab-btn.active-agenda {
+background: rgba(255, 199, 44, 0.9);
+color: #090d16;
+font-weight: 900;
+box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+​/* Horizontale scrolbare filterbalk (Frosted glass) */
+.pill-row {
+display: flex;
+gap: 6px;
+overflow-x: auto;
+padding-bottom: 2px;
+scrollbar-width: none;
+}
+.pill-row::-webkit-scrollbar { display: none; }
+​.pill {
+flex-shrink: 0;
+background: rgba(15, 23, 42, 0.45);
+backdrop-filter: blur(10px);
+-webkit-backdrop-filter: blur(10px);
+border: 1px solid rgba(255, 255, 255, 0.2);
+color: #cbd5e1;
+padding: 6px 12px;
+border-radius: 20px;
+font-size: 11px;
+font-weight: 700;
+cursor: pointer;
+white-space: nowrap;
+transition: all 0.15s ease;
+}
+.pill.active-pill-news {
+background: rgba(200, 16, 46, 0.9);
+border-color: rgba(255, 255, 255, 0.4);
+color: #ffffff;
+}
+.pill.active-pill-agenda {
+background: rgba(255, 199, 44, 0.92);
+border-color: rgba(255, 199, 44, 0.9);
+color: #090d16;
+font-weight: 900;
+}
+​/* Zoekglas pop-up venster */
+#searchOverlay {
+display: none;
+position: fixed;
+top: 0;
+left: 50%;
+transform: translateX(-50%);
+width: 100%;
+max-width: 480px;
+background-color: rgba(15, 23, 42, 0.96);
+backdrop-filter: blur(16px);
+border-bottom: 2px solid var(--gold);
+padding: 12px 14px;
+z-index: 9999;
+box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+#searchOverlay.open {
+display: block;
+animation: slideDown 0.2s ease-out;
+}
+@keyframes slideDown {
+from { transform: translateX(-50%) translateY(-100%); }
+to { transform: translateX(-50%) translateY(0); }
+}
+​.search-inner {
+display: flex;
+gap: 10px;
+align-items: center;
+}
+.search-inner input {
+flex: 1;
+background-color: #1e293b;
+border: 1px solid var(--border);
+border-radius: 10px;
+padding: 9px 12px;
+color: #fff;
+font-size: 13px;
+outline: none;
+}
+.search-inner button {
+background: #334155;
+color: #fff;
+border: none;
+padding: 8px 12px;
+border-radius: 10px;
+font-size: 12px;
+font-weight: bold;
+cursor: pointer;
+}
+​#activeSearchBadge {
+display: none;
+margin: 8px 14px 0;
+background: rgba(255, 199, 44, 0.15);
+border: 1px solid var(--gold);
+border-radius: 8px;
+padding: 6px 10px;
+font-size: 11px;
+color: var(--gold);
+align-items: center;
+justify-content: space-between;
+}
+​/* Content feed */
+.content-wrap {
+flex: 1;
+padding: 12px 14px 85px;
+display: flex;
+flex-direction: column;
+gap: 14px;
+}
+​.feed-card {
+background-color: var(--card);
+border: 1px solid var(--border);
+border-radius: 14px;
+overflow: hidden;
+display: flex;
+flex-direction: column;
+cursor: pointer;
+transition: transform 0.15s ease, border-color 0.2s ease;
+}
+.feed-card:active {
+transform: scale(0.985);
+}
+.feed-card.loos-border { border-color: rgba(255, 107, 0, 0.5); }
+.feed-card.stare-border { border-color: rgba(255, 199, 44, 0.5); }
+.feed-card.animal-border { border-color: rgba(20, 184, 166, 0.6); }
+​.card-img-wrap {
+width: 100%;
+height: 160px;
+position: relative;
+background-color: #1a2436;
+}
+.card-img-wrap img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+display: block;
+}
+​.card-img-overlay {
+position: absolute;
+top: 10px;
+left: 10px;
+display: flex;
+gap: 6px;
+}
+​.card-img-time {
+position: absolute;
+bottom: 8px;
+right: 8px;
+background: rgba(0,0,0,0.75);
+color: #f1f5f9;
+font-size: 10px;
+font-weight: 700;
+padding: 3px 7px;
+border-radius: 6px;
+backdrop-filter: blur(4px);
+}
+​.card-body {
+padding: 12px 14px 14px;
+}
+​.card-title {
+font-size: 15px;
+font-weight: 800;
+color: #ffffff;
+line-height: 1.35;
+margin-bottom: 6px;
+}
+​.card-snippet {
+font-size: 12px;
+color: #94a3b8;
+line-height: 1.45;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
+overflow: hidden;
+margin-bottom: 10px;
+}
+​.card-footer {
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 11px;
+color: var(--gold);
+font-weight: 700;
+border-top: 1px solid rgba(255,255,255,0.06);
+padding-top: 8px;
+}
+​.btn-share {
+background: rgba(255, 255, 255, 0.08);
+border: 1px solid rgba(255, 255, 255, 0.15);
+color: #cbd5e1;
+padding: 4px 9px;
+border-radius: 8px;
+font-size: 11px;
+font-weight: 700;
+display: flex;
+align-items: center;
+gap: 4px;
+cursor: pointer;
+}
+.btn-share:active {
+background: var(--gold);
+color: #090d16;
+}
+​.badge {
+font-size: 10px;
+font-weight: 800;
+padding: 3px 8px;
+border-radius: 6px;
+background-color: rgba(200, 16, 46, 0.85);
+color: #fff;
+backdrop-filter: blur(4px);
+}
+.badge.loos { background-color: rgba(255, 107, 0, 0.9); }
+.badge.stare { background-color: rgba(255, 199, 44, 0.9); color: #000; font-weight: 900; }
+.badge.animal { background-color: rgba(20, 184, 166, 0.9); }
+.badge.region { background-color: rgba(56, 189, 248, 0.85); color: #042f2e; font-weight: 900; }
+.badge.vereniging { background-color: rgba(168, 85, 247, 0.85); }
+​/* INLINE FRAME VIEWER MET AUTOMATISCHE BLOKKADE DETECTIE */
+#iframeContainer {
+position: fixed;
+inset: 0;
+background-color: #070b12;
+z-index: 100000;
+display: none;
+flex-direction: column;
+}
+#iframeContainer.open {
+display: flex;
+}
+​.iframe-toolbar {
+background-color: #111a2c;
+border-bottom: 1px solid var(--border);
+padding: 10px 14px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 10px;
+}
+​.iframe-info {
+flex: 1;
+min-width: 0;
+}
+​.iframe-title {
+font-size: 12px;
+font-weight: 800;
+color: #fff;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+​.iframe-url {
+font-size: 10px;
+color: var(--gold);
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+​.btn-toolbar {
+padding: 7px 12px;
+border-radius: 8px;
+font-size: 11px;
+font-weight: 800;
+cursor: pointer;
+border: none;
+}
+​.btn-close-viewer {
+background-color: var(--red);
+color: #fff;
+}
+​.btn-ext-link {
+background-color: #1e293b;
+color: #cbd5e1;
+border: 1px solid var(--border);
+text-decoration: none;
+display: flex;
+align-items: center;
+gap: 3px;
+}
+​.iframe-wrap {
+position: relative;
+flex: 1;
+width: 100%;
+background-color: #ffffff;
+}
+​#inAppFrame {
+width: 100%;
+height: 100%;
+border: none;
+}
+​/* Fallback wanneer een externe website insluiting in een frame weigert (ERR_BLOCKED_BY_RESPONSE) */
+#iframeFallbackBox {
+position: absolute;
+inset: 0;
+background-color: #0b1220;
+display: none;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+padding: 24px;
+text-align: center;
+z-index: 10;
+}
+​/* Bottom Bar */
+.bottom-bar {
+position: fixed;
+bottom: 0;
+left: 50%;
+transform: translateX(-50%);
+width: 100%;
+max-width: 480px;
+background-color: rgba(7, 11, 18, 0.92);
+backdrop-filter: blur(14px);
+-webkit-backdrop-filter: blur(14px);
+border-top: 1px solid var(--border);
+display: flex;
+justify-content: space-around;
+padding: 9px 0;
+z-index: 50;
+}
+.nav-btn {
+background: none;
+border: none;
+color: var(--sub);
+font-size: 11px;
+font-weight: 700;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 3px;
+cursor: pointer;
+}
+.nav-btn.active { color: var(--red); }
+.nav-btn.active-gold { color: var(--gold); }
+.nav-btn.animal { color: var(--animal-teal); font-weight: 800; }
+.nav-btn.alert { color: var(--alert-red); font-weight: 800; }
+</style>
+</head>
+<body>
+​<div id="app">
+​<!-- Pop-up Melding (Toast) -->
+<div id="toast" onclick="hideToast()">
+<div class="toast-star">★</div>
+<div style="flex:1; min-width:0;">
+<div id="toastSub" style="font-size:9px; font-weight:900; color:var(--red); text-transform:uppercase;">Mestreech Breaking</div>
+<div id="toastTitle" style="font-size:13px; font-weight:700; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Nieuwsflits</div>
+<div id="toastBody" style="font-size:11px; color:#cbd5e1;">Tik om direct in-app te bekijken</div>
 </div>
-
-<script> // Echte data voor Maastricht e.o. inclusief Dierenbescherming en Amivedi const newsData = [ { id: 1, title: "🐾 Dierenbescherming Limburg: Vermiste honden rondom Maastricht", source: "Mijn Dier Is Zoek", url: "https://mijndieriszoek.dierenbescherming.nl/vermiste-dieren/honden?location=Maastricht", category: "Vermist dier", time: "15 min geleden", image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=700&q=80", snippet: "Overzicht van actuele meldingen van vermiste en gesignaleerde honden in regio Maastricht en Mergelland.", locationTag: "Maastricht e.o." }, { id: 2, title: "🐾 Gevonden zwerfdier: Reu gesignaleerd nabij Florijnruwe", source: "Dierenbeschermingscentrum", url: "https://mijndieriszoek.dierenbescherming.nl/gevonden-dieren/honden?location=Maastricht", category: "Vermist dier", time: "35 min geleden", image: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=700&q=80", snippet: "Opgevangen en gecontroleerd op chip door de dierenambulance. Eigenaar gezocht in Malberg/Brusselsepoort.", locationTag: "Malberg" }, { id: 3, title: "🐾 Gevonden kat: Cypers-wit gemeld in Dierenbeschermingscentrum Limburg", source: "Mijn Dier Is Zoek", url: "https://mijndieriszoek.dierenbescherming.nl/gevonden-dieren/katten?location=Maastricht", category: "Vermist dier", time: "1 uur geleden", image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=700&q=80", snippet: "Binnengebracht vanaf Heerlen/Maastricht. Bekijk foto en uniek kenmerk op het officiële portaal.", locationTag: "Heer" }, { id: 4, title: "Wat is loos in Mestreech: Kettingbotsing met drie voertuigen op A2 richting Eindhoven", source: "Wat is loos in Mestreech", url: "https://watisloos.nl/", category: "Wat is loos", time: "1 uur geleden", image: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=700&q=80", snippet: "Snelweg tijdelijk afgesloten na zware aanrijding tussen meerdere wagens. Hulpdiensten en bergingsbedrijven zijn ter plaatse.", locationTag: "A2 Maastricht" }, { id: 5, title: "Wat is loos in Mestreech: Politie rukt uit voor personen met bivakmutsen op flatgalerij", source: "Wat is loos in Mestreech", url: "https://watisloos.nl/", category: "Wat is loos", time: "2 uur geleden", image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=700&q=80", snippet: "Meerdere patrouilles en hondengeleiders omsingelden het complex na verontrustende meldingen van omwonenden.", locationTag: "Malberg" }, { id: 6, title: "De Nieuwe Ster: Ondernemers Wyck bezorgd over bereikbaarheid en parkeerplannen", source: "De Nieuwe Ster", url: "https://www.denieuwestermaastricht.nl/", category: "De Nieuwe Ster", time: "3 uur geleden", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80", snippet: "Winkeliers en horeca in de Rechtstraat vrezen omzetverlies door nieuwe gemeentelijke venstertijden en verkeersknipsels.", locationTag: "Wyck" }, { id: 7, title: "De Nieuwe Ster: Verhalen uit de wijken – Hoe levend is 't Mestreechs dialek?", source: "De Nieuwe Ster", url: "https://www.denieuwestermaastricht.nl/", category: "De Nieuwe Ster", time: "4 uur geleden", image: "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=700&q=80", snippet: "Een diepgaand portret over jongeren, verenigingen en het voortbestaan van de Maastrichtse moedertaal in een internationale universiteitsstad.", locationTag: "Cultuur" }, { id: 8, title: "Vrijthof maakt zich op voor André Rieu concerten: opbouw van start", source: "De Limburger", url: "https://www.delimburger.nl/regio/maastricht", category: "De Limburger", time: "5 uur geleden", image: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=700&q=80", snippet: "Het grootste openluchtpodium van Nederland verrijst op het Vrijthof. Horecaondernemers zetten tienduizenden extra stoelen klaar.", locationTag: "Vrijthof" }, { id: 9, title: "L1 / RTV Maastricht: Live debat over de Maasboulevard en verkeersstromen", source: "L1 / RTV", url: "https://www.rtvmaastricht.nl", category: "L1 / RTV", time: "6 uur geleden", image: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=700&q=80", snippet: "Wethouders en bezorgde bewonersgroepen gingen fel in discussie over sluipverkeer tussen Céramique en de binnenstad.", locationTag: "Centrum" } ];
-
-const agendaData = [ { id: 101, title: "Live Jazz op de Markt & Jekerterras", location: "Markt & Jekerkwartier Maastricht", timeLabel: "Vandaag • 19:30 uur", period: "vandaag", regionTag: "Maastricht", price: "Gratis toegang", image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=700&q=80", snippet: "Gezellig terrasconcert met lokale Maastrichtse jazzmuzikanten. Geniet van muziek en een lokaal Mestreechs pilske.", url: "https://www.bezoekmaastricht.nl/uitagenda" }, { id: 102, title: "Riemst (BE): Fakkeltocht & Geheimen van Mergelgrotten Kanne", location: "Avergat 14, 3770 Kanne (Riemst)", timeLabel: "Vandaag • 20:30 uur", period: "vandaag", regionTag: "Riemst", price: "€ 14,00", image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80", snippet: "Spectaculaire avondrondleiding bij kaarslicht door het ondergrondse labyrint van Kanne, net over de grens bij Maastricht.", url: "https://www.riemst.be/nl/toerisme" }, { id: 103, title: "Koninklijke Harmonie Sainte Cécile: Zomeravond Serenade", location: "Vroenhof / Blekerij, Eijsden", timeLabel: "Morgen • 19:45 uur", period: "morgen", regionTag: "Verenigingen", price: "Vrije bijdrage", image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=700&q=80", snippet: "Het befaamde 'Rood van Eijsden' brengt een sfeervol openluchtconcert met klassieke marsen en filmmuziek.", url: "https://www.visiteijsdenmargraten.nl/" }, { id: 104, title: "Eijsden-Margraten: Landgoedfair & Ambachten rondom Kasteel Eijsden", location: "Kasteellaan 1, Eijsden", timeLabel: "Morgen • 10:00 - 17:00 uur", period: "morgen", regionTag: "Eijsden-Margraten", price: "€ 6,50", image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=700&q=80", snippet: "Bourgondische streekmarkt, antiek, kunst en lokale wijnen uit het Maasdal in de kasteeltuinen.", url: "https://www.visiteijsdenmargraten.nl/" }, { id: 105, title: "Lanaken (BE): Zomerfestival & Kids Doe-Dag Pietersheim", location: "Waterburcht Pietersheim, Lanaken", timeLabel: "Dit Weekend • Za & Zo v.a. 12:00", period: "weekend", regionTag: "Lanaken", price: "Gratis entree", image: "https://images.unsplash.com/photo-1472653431158-6364773b2a56?auto=format&fit=crop&w=700&q=80", snippet: "Ontdek de 12e-eeuwse waterburcht, kinderboerderij en middeleeuwse spelen voor de hele familie.", url: "https://www.lanaken.be/toerisme" }, { id: 106, title: "Valkenburg aan de Geul: Openlucht Ridderspektakel & Vuurshow", location: "Grendelplein / Kasteelruïne Valkenburg", timeLabel: "Dit Weekend • Zaterdag 21:00", period: "weekend", regionTag: "Valkenburg", price: "€ 12,50", image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=700&q=80", snippet: "Magische vuurspuwers, verlichte kasteelmuren en akoestische middeleeuwse folkmuziek hoog boven het Geuldal.", url: "https://www.visitzuidlimburg.nl/agenda/" }, { id: 107, title: "Meerssen: Orgelconcert & Barokmiddag in de Basiliek", location: "Markt 37, Basiliek van het H. Sacrament", timeLabel: "Dit Weekend • Zondag 15:00 uur", period: "weekend", regionTag: "Meerssen", price: "Gratis (deurcollecte)", image: "https://images.unsplash.com/photo-1548625361-16a75095d909?auto=format&fit=crop&w=700&q=80", snippet: "Geniet van de magistrale akoestiek in het gotische pronkstuk van Meerssen met meesterwerken van Bach.", url: "https://www.meerssen.nl" }, { id: 108, title: "Schuttersfeest Bond Gerardus: Optocht & Schietwedstrijden", location: "Schuttersterrein Gronsveld", timeLabel: "Komende Week • Donderdag 13:00", period: "week", regionTag: "Verenigingen", price: "Gratis", image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=700&q=80", snippet: "Kleurrijke historische optocht van meer dan 20 Zuid-Limburgse schutterijen in vol ornaat met vaandels en buksen.", url: "https://www.denieuwestermaastricht.nl/" }, { id: 109, title: "Riemst (BE): Brug van Vroenhoven Expo & Streekwijnen", location: "Maastrichtersteenweg 212, Vroenhoven", timeLabel: "Komende Week • Woensdag t/m Zondag", period: "week", regionTag: "Riemst", price: "€ 8,00", image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=700&q=80", snippet: "Beleef de opening van de Tweede Wereldoorlog en ontdek de geheimen van het Albertkanaal en Haspengouwse wijnen.", url: "https://www.riemst.be/nl/ontdekken/bezienswaardigheden/de-brug-van-vroenhoven" } ];
-
-let currentTab = 'nieuws'; let currentNewsFilter = 'alles'; let currentAgendaFilter = 'alles'; let searchQuery = '';
-
-function render() { if (currentTab === 'nieuws') { renderNews(); } else { renderAgenda(); }
-
-const badge = document.getElementById('activeSearchBadge'); const badgeText = document.getElementById('activeSearchText'); if (searchQuery.trim().length > 0) { badge.style.display = 'flex'; badgeText.textContent = Zoekresultaten voor: "${searchQuery}"; } else { badge.style.display = 'none'; } }
-
-function renderNews() { const listEl = document.getElementById('newsList');
-
-let filtered = newsData.filter(item => { const matchFilter = (currentNewsFilter === 'alles') || (item.category === currentNewsFilter); const q = searchQuery.toLowerCase(); const matchSearch = !q || item.title.toLowerCase().includes(q) || item.snippet.toLowerCase().includes(q) || item.source.toLowerCase().includes(q) || item.locationTag.toLowerCase().includes(q); return matchFilter && matchSearch; });
-
-if (filtered.length === 0) { listEl.innerHTML = '<div style="text-align:center; padding:40px 10px; color:#64748b;">Geen berichten gevonden voor deze selectie.</div>'; return; }
-
-let html = ''; for (let i = 0; i < filtered.length; i++) { const it = filtered[i]; const isLoos = it.source === 'Wat is loos in Mestreech'; const isStare = it.source === 'De Nieuwe Ster'; const isAnimal = it.category === 'Vermist dier';
-
-let borderClass = ''; if (isAnimal) borderClass = 'animal-border'; else if (isLoos) borderClass = 'loos-border'; else if (isStare) borderClass = 'stare-border';
-
-let badgeClass = ''; let iconPrefix = ''; if (isAnimal) { badgeClass = 'animal'; iconPrefix = '🐾 '; } else if (isLoos) { badgeClass = 'loos'; iconPrefix = '⚡ '; } else if (isStare) { badgeClass = 'stare'; iconPrefix = '★ '; }
-
-html += <div class="feed-card borderClass"onclick="openInlineViewer('{it.url}', 'escapeHtml(it.title)')"><divclass="card-img-wrap"><imgsrc="{it.image}" alt="${escapeHtml(it.title)}" loading="lazy"> <div class="card-img-overlay"> <span class="badge badgeClass">{iconPrefix}${it.source}</span> </div> <span class="card-img-time">🕒 it.time</span></div><divclass="card-body"><divclass="card-title">{it.title}</div> <div class="card-snippet">${it.snippet}</div> <div class="card-footer"> <span>📍 it.locationTag</span><buttonclass="btn-share"onclick="shareItem(event,'{escapeHtml(it.title)}', '${it.url}')" title="Deel dit bericht"> <span>Delen</span> ➦ </button> </div> </div> </div>; } listEl.innerHTML = html; }
-
-function renderAgenda() { const listEl = document.getElementById('agendaList');
-
-let filtered = agendaData.filter(item => { let matchFilter = false; if (currentAgendaFilter === 'alles') { matchFilter = true; } else if (['vandaag', 'morgen', 'weekend', 'week'].includes(currentAgendaFilter)) { matchFilter = item.period === currentAgendaFilter; } else { matchFilter = (item.regionTag === currentAgendaFilter); }
-
-const q = searchQuery.toLowerCase(); const matchSearch = !q || item.title.toLowerCase().includes(q) || item.location.toLowerCase().includes(q) || item.regionTag.toLowerCase().includes(q) || item.snippet.toLowerCase().includes(q); return matchFilter && matchSearch; });
-
-if (filtered.length === 0) { listEl.innerHTML = '<div style="text-align:center; padding:40px 10px; color:#64748b;">Geen activiteiten gevonden in de callepin.</div>'; return; }
-
-let html = ''; for (let i = 0; i < filtered.length; i++) { const it = filtered[i]; const isBelgie = it.regionTag === 'Riemst' || it.regionTag === 'Lanaken'; const isVereniging = it.regionTag === 'Verenigingen'; let tagClass = 'region'; if (isBelgie) tagClass = 'region'; if (isVereniging) tagClass = 'vereniging';
-
-html += <div class="feed-card" onclick="openInlineViewer('it.url','{escapeHtml(it.title)}')"> <div class="card-img-wrap"> <img src="it.image"alt="{escapeHtml(it.title)}" loading="lazy"> <div class="card-img-overlay"> <span class="badge tagClass">{it.regionTag}</span> </div> <span class="card-img-time" style="color:var(--gold); font-weight:800;">it.price</span></div><divclass="card-body"><divclass="card-title">{it.title}</div> <div style="font-size:12px; color:var(--gold); font-weight:800; margin-bottom:4px;">🕒 it.timeLabel</div><divclass="card-snippet">{it.snippet}</div> <div class="card-footer"> <span>📍 it.location</span><buttonclass="btn-share"onclick="shareItem(event,'{escapeHtml(it.title)}', '${it.url}')" title="Deel dit agendapunt"> <span>Delen</span> ➦ </button> </div> </div> </div>; } listEl.innerHTML = html; }
-
-/* Direct native delen */ function shareItem(event, title, url) { event.stopPropagation(); if (navigator.share) { navigator.share({ title: title, text: ${title} – Gevonden op Mestreech Vendaog:\n, url: url }).catch(() => {}); } else { navigator.clipboard.writeText(${title} - ${url}); alert("Link gekopieerd naar klembord!"); } }
-
-/* Slimme inline viewer die blokkades zoals Amivedi direct afvangt */ function openInlineViewer(url, title) { const container = document.getElementById('iframeContainer'); const frame = document.getElementById('inAppFrame'); const fallbackBox = document.getElementById('iframeFallbackBox'); const titleEl = document.getElementById('frameTitle'); const urlEl = document.getElementById('frameUrl'); const extLink = document.getElementById('frameExtLink'); const fallbackBtn = document.getElementById('fallbackOpenBtn');
-
-titleEl.textContent = title || "Origineel bericht"; urlEl.textContent = url; extLink.href = url; fallbackBtn.href = url;
-
-// Sites waarvan bekend is dat ze X-Frame-Options blokkeren if (url.includes('amivedi.nl') || url.includes('facebook.com') || url.includes('twitter.com')) { frame.style.display = 'none'; fallbackBox.style.display = 'flex'; } else { frame.style.display = 'block'; fallbackBox.style.display = 'none'; frame.src = url; }
-
-container.className = 'open'; }
-
-function closeInlineViewer() { const container = document.getElementById('iframeContainer'); const frame = document.getElementById('inAppFrame'); const fallbackBox = document.getElementById('iframeFallbackBox'); container.className = ''; frame.src = 'about:blank'; fallbackBox.style.display = 'none'; }
-
-/* Snel naar Dierenbescherming Maastricht e.o. filter */ function openAnimalHub() { setTab('nieuws'); setNewsFilter('Vermist dier'); }
-
-/* Zoekglas pop-up functies */ function openSearch() { const overlay = document.getElementById('searchOverlay'); const input = document.getElementById('popupSearchInput'); overlay.className = 'open'; input.focus(); }
-
-function closeSearch() { document.getElementById('searchOverlay').className = ''; }
-
-function resetSearch() { searchQuery = ''; document.getElementById('popupSearchInput').value = ''; render(); }
-
-function onSearchChange(val) { searchQuery = val; render(); }
-
-function setTab(tab) { currentTab = tab; const newsList = document.getElementById('newsList'); const agendaList = document.getElementById('agendaList'); const newsFilters = document.getElementById('newsFilters'); const agendaFilters = document.getElementById('agendaFilters'); const btnNews = document.getElementById('btnTabNews'); const btnAgenda = document.getElementById('btnTabAgenda'); const navNews = document.getElementById('navNews'); const navAgenda = document.getElementById('navAgenda');
-
-if (tab === 'nieuws') { newsList.style.display = 'flex'; agendaList.style.display = 'none'; newsFilters.style.display = 'flex'; agendaFilters.style.display = 'none';
-
-btnNews.className = 'tab-btn active-news'; btnAgenda.className = 'tab-btn'; navNews.className = 'nav-btn active'; navAgenda.className = 'nav-btn'; } else { newsList.style.display = 'none'; agendaList.style.display = 'flex'; newsFilters.style.display = 'none'; agendaFilters.style.display = 'flex';
-
-btnNews.className = 'tab-btn'; btnAgenda.className = 'tab-btn active-agenda'; navNews.className = 'nav-btn'; navAgenda.className = 'nav-btn active-gold'; } render(); }
-
-function setNewsFilter(category, btnElement) { currentNewsFilter = category; const pills = document.querySelectorAll('#newsFilters .pill'); pills.forEach(p => { if (p.textContent.includes(category) || (category === 'alles' && p.textContent.includes('Alles'))) { p.className = 'pill active-pill-news'; } else { p.className = 'pill'; } }); render(); }
-
-function setAgendaFilter(filterVal, btnElement) { currentAgendaFilter = filterVal; const pills = document.querySelectorAll('#agendaFilters .pill'); pills.forEach(p => p.className = 'pill'); if (btnElement) { btnElement.className = 'pill active-pill-agenda'; } else { pills[0].className = 'pill active-pill-agenda'; } render(); }
-
-function testNotification() { const alerts = [ { sub: "🐾 Dierenbescherming Limburg", title: "Hond vermist in Malberg / Florijnruwe!", body: "Gesignaleerd nabij het groengebied. Kijk mee uit.", url: "https://mijndieriszoek.dierenbescherming.nl/vermiste-dieren/honden?location=Maastricht" }, { sub: "🚨 112 P2000 Maastricht", title: "Brandweer met spoed naar Céramique", body: "Melding automatische brandmelder. Hulpdiensten onderweg.", url: "https://www.stadindex.nl/112/maastricht" }, { sub: "⚡ Wat is loos in Mestreech", title: "Kettingbotsing A2 Maastricht - Eindhoven", body: "Snelweg tijdelijk dicht. Hulpdiensten ter plaatse.", url: "https://watisloos.nl/" } ]; const chosen = alerts[Math.floor(Math.random() * alerts.length)];
-
-const toast = document.getElementById('toast'); document.getElementById('toastSub').textContent = chosen.sub; document.getElementById('toastTitle').textContent = chosen.title; document.getElementById('toastBody').textContent = chosen.body; toast.onclick = function() { hideToast(); openInlineViewer(chosen.url, chosen.title); };
-
-toast.className = 'active';
-
-setTimeout(() => { hideToast(); }, 5000); }
-
-function hideToast() { document.getElementById('toast').className = ''; }
-
-function escapeHtml(str) { if (!str) return ''; return str.replace(/'/g, "\'").replace(/"/g, '"'); }
-
-render(); </script> </body> </html>
-
+</div>
+​<!-- Uitklapbaar Zoekvenster -->
+<div id="searchOverlay">
+<div class="search-inner">
+<input type="text" id="popupSearchInput" placeholder="Zoek op buurt (Wyck, Scharn), dier of trefwoord..." oninput="onSearchChange(this.value)">
+<button onclick="closeSearch()">✕ Sluiten</button>
+</div>
+</div>
+​<!-- HEADER MET DE WAPPERENDE MAASTRICHTSE VLAG OVER DE BREEDTE -->
+<header>
+<!-- Wapperende Maastrichtse vlag achtergrond -->
+<div class="header-flag-bg">
+<svg class="flag-star-svg" viewBox="0 0 51 48">
+<path d="m25.5 0 7.88 15.96 17.62 2.56-12.75 12.43 3.01 17.55-15.76-8.29-15.76 8.29 3.01-17.55-12.75-12.43 17.62-2.56z"/>
+</svg>
+<div class="flag-folds-overlay"></div>
+</div>
+<div class="header-dark-tint"></div>
+​<!-- Voorgrond content met semi-transparante styling -->
+<div class="header-content">
+<div class="header-top">
+<div class="logo-title-group">
+<div class="header-badge">★</div>
+<div>
+<div style="font-size:20px; font-weight:900; letter-spacing:-0.3px; color:#fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+Mestreech Vendaog
+</div>
+<div style="font-size:10px; color:#f1f5f9; display:flex; align-items:center; gap:5px; font-weight:600; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+<span style="width:7px; height:7px; border-radius:50%; background:#10b981; display:inline-block; box-shadow: 0 0 6px #10b981;"></span>
+Stad, Buurten & Grensregio
+</div>
+</div>
+</div>
+​<button class="btn-bell" onclick="testNotification()" title="Test Melding">
+🔔
+</button>
+</div>
+​<!-- Licht transparante tab switcher -->
+<div class="tab-box">
+<button id="btnTabNews" class="tab-btn active-news" onclick="setTab('nieuws')">
+<span>📰</span> Mestreechs Nuijts
+</button>
+<button id="btnTabAgenda" class="tab-btn" onclick="setTab('agenda')">
+<span>📒</span> Callepin
+</button>
+</div>
+​<!-- Licht transparante scrolbare filters voor Nuijts -->
+<div id="newsFilters" class="pill-row">
+<button class="pill active-pill-news" onclick="setNewsFilter('alles', this)">🔥 Alles</button>
+<button class="pill" onclick="setNewsFilter('Vermist dier', this)">🐾 Vermiste Diere</button>
+<button class="pill" onclick="setNewsFilter('Wat is loos', this)">⚡ Wat is Loos</button>
+<button class="pill" onclick="setNewsFilter('De Nieuwe Ster', this)">⭐ De Nieuwe Ster</button>
+<button class="pill" onclick="setNewsFilter('De Limburger', this)">📰 De Limburger</button>
+<button class="pill" onclick="setNewsFilter('L1 / RTV', this)">📻 L1 / RTV</button>
+<button class="pill" onclick="setNewsFilter('Socials', this)">💬 Socials (X/FB)</button>
+<button class="pill" onclick="setNewsFilter('Gemeente', this)">🏛️ Gemeente & 112</button>
+</div>
+​<!-- Licht transparante scrolbare filters voor Callepin -->
+<div id="agendaFilters" class="pill-row" style="display:none;">
+<button class="pill active-pill-agenda" onclick="setAgendaFilter('alles', this)">📅 Alles</button>
+<button class="pill" onclick="setAgendaFilter('vandaag', this)">⚡ Vandaag</button>
+<button class="pill" onclick="setAgendaFilter('morgen', this)">☀️ Morgen</button>
+<button class="pill" onclick="setAgendaFilter('weekend', this)">🥂 Dit Weekend</button>
+<button class="pill" onclick="setAgendaFilter('week', this)">🗓️ Komende Week</button>
+<button class="pill" onclick="setAgendaFilter('Verenigingen', this)">🎺 Verenigingen</button>
+<button class="pill" onclick="setAgendaFilter('Eijsden-Margraten', this)">🌳 Eijsden-Margraten</button>
+<button class="pill" onclick="setAgendaFilter('Meerssen', this)">⛪ Meerssen</button>
+<button class="pill" onclick="setAgendaFilter('Valkenburg', this)">🏰 Valkenburg</button>
+<button class="pill" onclick="setAgendaFilter('Lanaken', this)">🇧🇪 Lanaken</button>
+<button class="pill" onclick="setAgendaFilter('Riemst', this)">🇧🇪 Riemst</button>
+</div>
+</div>
+</header>
+​<!-- Actieve zoekopdracht indicatie -->
+<div id="activeSearchBadge">
+<span id="activeSearchText">Zoeken: ...</span>
+<span style="cursor:pointer; font-weight:bold; padding-left:8px;" onclick="resetSearch()">✕ Wis filter</span>
+</div>
+​<!-- Content Lists -->
+<div id="newsList" class="content-wrap"></div>
+<div id="agendaList" class="content-wrap" style="display:none;"></div>
+​<!-- In-App Inline Frame Viewer met slimme beveiligings-fallback -->
+<div id="iframeContainer">
+<div class="iframe-toolbar">
+<button class="btn-toolbar btn-close-viewer" onclick="closeInlineViewer()">
+✕ Sluiten
+</button>
+<div class="iframe-info">
+<div id="frameTitle" class="iframe-title">Laden...</div>
+<div id="frameUrl" class="iframe-url">https://...</div>
+</div>
+<a id="frameExtLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-toolbar btn-ext-link" title="Open in Chrome">
+Chrome ↗
+</a>
+</div>
+​<div class="iframe-wrap">
+<iframe id="inAppFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+​<!-- Fallback scherm bij browser-blokkades zoals Amivedi -->
+<div id="iframeFallbackBox">
+<div style="font-size:36px; margin-bottom:12px;">🛡️</div>
+<div style="font-size:16px; font-weight:800; color:#fff; margin-bottom:8px;">
+Website beveiligt directe insluiting
+</div>
+<div style="font-size:12px; color:#94a3b8; max-width:320px; line-height:1.5; margin-bottom:20px;">
+Deze externe site (zoals Amivedi) staat directe weergave binnen een inline frame niet toe via hun serverbeleid. Open de beveiligde pagina direct in Chrome op je Pixel:
+</div>
+<a id="fallbackOpenBtn" href="#" target="_blank" rel="noopener noreferrer" style="background:var(--red); color:#fff; font-weight:800; font-size:13px; padding:10px 20px; border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+Open direct in Chrome ↗
+</a>
+</div>
+</div>
+</div>
+​<!-- Bottom Bar: Nuijts, Callepin, Vermiste Dieren Maastricht, Zoeken & 112 -->
+<nav class="bottom-bar">
+<!-- 1. Mestreechs Nuijts -->
+<button id="navNews" class="nav-btn active" onclick="setTab('nieuws'); setNewsFilter('alles')">
+<span style="font-size:17px;">📰</span>
+<span>Nuijts</span>
+</button>
+​<!-- 2. Callepin -->
+<button id="navAgenda" class="nav-btn" onclick="setTab('agenda')">
+<span style="font-size:17px;">📒</span>
+<span>Callepin</span>
+</button>
+​<!-- 3. Echte Dierenbescherming & Amivedi Maastricht e.o. filter -->
+<button class="nav-btn animal" onclick="openAnimalHub()" title="Vermiste Dieren Maastricht">
+<span style="font-size:17px;">🐾</span>
+<span>Diere</span>
+</button>
+​<!-- 4. Zoekglas -->
+<button class="nav-btn" onclick="openSearch()" title="Zoeken">
+<span style="font-size:17px;">🔍</span>
+<span>Zoeken</span>
+</button>
+​<!-- 5. 112 Maastricht direct naar Stadindex -->
+<button class="nav-btn alert" onclick="openInlineViewer('https://www.stadindex.nl/112/maastricht', '🚨 112 Meldingen Maastricht (P2000)')" title="112 Maastricht">
+<span style="font-size:17px;">🚨</span>
+<span>112 Melding</span>
+</button>
+</nav>
+​</div>
+​<script>
+// Echte data voor Maastricht e.o. inclusief Dierenbescherming en Amivedi
+const newsData = [
+{
+id: 1,
+title: "🐾 Dierenbescherming Limburg: Vermiste honden rondom Maastricht",
+source: "Mijn Dier Is Zoek",
+url: "https://mijndieriszoek.dierenbescherming.nl/vermiste-dieren/honden?location=Maastricht",
+category: "Vermist dier",
+time: "15 min geleden",
+image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=700&q=80",
+snippet: "Overzicht van actuele meldingen van vermiste en gesignaleerde honden in regio Maastricht en Mergelland.",
+locationTag: "Maastricht e.o."
+},
+{
+id: 2,
+title: "🐾 Gevonden zwerfdier: Reu gesignaleerd nabij Florijnruwe",
+source: "Dierenbeschermingscentrum",
+url: "https://mijndieriszoek.dierenbescherming.nl/gevonden-dieren/honden?location=Maastricht",
+category: "Vermist dier",
+time: "35 min geleden",
+image: "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=700&q=80",
+snippet: "Opgevangen en gecontroleerd op chip door de dierenambulance. Eigenaar gezocht in Malberg/Brusselsepoort.",
+locationTag: "Malberg"
+},
+{
+id: 3,
+title: "🐾 Gevonden kat: Cypers-wit gemeld in Dierenbeschermingscentrum Limburg",
+source: "Mijn Dier Is Zoek",
+url: "https://mijndieriszoek.dierenbescherming.nl/gevonden-dieren/katten?location=Maastricht",
+category: "Vermist dier",
+time: "1 uur geleden",
+image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=700&q=80",
+snippet: "Binnengebracht vanaf Heerlen/Maastricht. Bekijk foto en uniek kenmerk op het officiële portaal.",
+locationTag: "Heer"
+},
+{
+id: 4,
+title: "Wat is loos in Mestreech: Kettingbotsing met drie voertuigen op A2 richting Eindhoven",
+source: "Wat is loos in Mestreech",
+url: "https://watisloos.nl/",
+category: "Wat is loos",
+time: "1 uur geleden",
+image: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=700&q=80",
+snippet: "Snelweg tijdelijk afgesloten na zware aanrijding tussen meerdere wagens. Hulpdiensten en bergingsbedrijven zijn ter plaatse.",
+locationTag: "A2 Maastricht"
+},
+{
+id: 5,
+title: "Wat is loos in Mestreech: Politie rukt uit voor personen met bivakmutsen op flatgalerij",
+source: "Wat is loos in Mestreech",
+url: "https://watisloos.nl/",
+category: "Wat is loos",
+time: "2 uur geleden",
+image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=700&q=80",
+snippet: "Meerdere patrouilles en hondengeleiders omsingelden het complex na verontrustende meldingen van omwonenden.",
+locationTag: "Malberg"
+},
+{
+id: 6,
+title: "De Nieuwe Ster: Ondernemers Wyck bezorgd over bereikbaarheid en parkeerplannen",
+source: "De Nieuwe Ster",
+url: "https://www.denieuwestermaastricht.nl/",
+category: "De Nieuwe Ster",
+time: "3 uur geleden",
+image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80",
+snippet: "Winkeliers en horeca in de Rechtstraat vrezen omzetverlies door nieuwe gemeentelijke venstertijden en verkeersknipsels.",
+locationTag: "Wyck"
+},
+{
+id: 7,
+title: "De Nieuwe Ster: Verhalen uit de wijken – Hoe levend is 't Mestreechs dialek?",
+source: "De Nieuwe Ster",
+url: "https://www.denieuwestermaastricht.nl/",
+category: "De Nieuwe Ster",
+time: "4 uur geleden",
+image: "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=700&q=80",
+snippet: "Een diepgaand portret over jongeren, verenigingen en het voortbestaan van de Maastrichtse moedertaal in een internationale universiteitsstad.",
+locationTag: "Cultuur"
+},
+{
+id: 8,
+title: "Vrijthof maakt zich op voor André Rieu concerten: opbouw van start",
+source: "De Limburger",
+url: "https://www.delimburger.nl/regio/maastricht",
+category: "De Limburger",
+time: "5 uur geleden",
+image: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=700&q=80",
+snippet: "Het grootste openluchtpodium van Nederland verrijst op het Vrijthof. Horecaondernemers zetten tienduizenden extra stoelen klaar.",
+locationTag: "Vrijthof"
+},
+{
+id: 9,
+title: "L1 / RTV Maastricht: Live debat over de Maasboulevard en verkeersstromen",
+source: "L1 / RTV",
+url: "https://www.rtvmaastricht.nl",
+category: "L1 / RTV",
+time: "6 uur geleden",
+image: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=700&q=80",
+snippet: "Wethouders en bezorgde bewonersgroepen gingen fel in discussie over sluipverkeer tussen Céramique en de binnenstad.",
+locationTag: "Centrum"
+}
+];
+​const agendaData = [
+{
+id: 101,
+title: "Live Jazz op de Markt & Jekerterras",
+location: "Markt & Jekerkwartier Maastricht",
+timeLabel: "Vandaag • 19:30 uur",
+period: "vandaag",
+regionTag: "Maastricht",
+price: "Gratis toegang",
+image: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=700&q=80",
+snippet: "Gezellig terrasconcert met lokale Maastrichtse jazzmuzikanten. Geniet van muziek en een lokaal Mestreechs pilske.",
+url: "https://www.bezoekmaastricht.nl/uitagenda"
+},
+{
+id: 102,
+title: "Riemst (BE): Fakkeltocht & Geheimen van Mergelgrotten Kanne",
+location: "Avergat 14, 3770 Kanne (Riemst)",
+timeLabel: "Vandaag • 20:30 uur",
+period: "vandaag",
+regionTag: "Riemst",
+price: "€ 14,00",
+image: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80",
+snippet: "Spectaculaire avondrondleiding bij kaarslicht door het ondergrondse labyrint van Kanne, net over de grens bij Maastricht.",
+url: "https://www.riemst.be/nl/toerisme"
+},
+{
+id: 103,
+title: "Koninklijke Harmonie Sainte Cécile: Zomeravond Serenade",
+location: "Vroenhof / Blekerij, Eijsden",
+timeLabel: "Morgen • 19:45 uur",
+period: "morgen",
+regionTag: "Verenigingen",
+price: "Vrije bijdrage",
+image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=700&q=80",
+snippet: "Het befaamde 'Rood van Eijsden' brengt een sfeervol openluchtconcert met klassieke marsen en filmmuziek.",
+url: "https://www.visiteijsdenmargraten.nl/"
+},
+{
+id: 104,
+title: "Eijsden-Margraten: Landgoedfair & Ambachten rondom Kasteel Eijsden",
+location: "Kasteellaan 1, Eijsden",
+timeLabel: "Morgen • 10:00 - 17:00 uur",
+period: "morgen",
+regionTag: "Eijsden-Margraten",
+price: "€ 6,50",
+image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=700&q=80",
+snippet: "Bourgondische streekmarkt, antiek, kunst en lokale wijnen uit het Maasdal in de kasteeltuinen.",
+url: "https://www.visiteijsdenmargraten.nl/"
+},
+{
+id: 105,
+title: "Lanaken (BE): Zomerfestival & Kids Doe-Dag Pietersheim",
+location: "Waterburcht Pietersheim, Lanaken",
+timeLabel: "Dit Weekend • Za & Zo v.a. 12:00",
+period: "weekend",
+regionTag: "Lanaken",
+price: "Gratis entree",
+image: "https://images.unsplash.com/photo-1472653431158-6364773b2a56?auto=format&fit=crop&w=700&q=80",
+snippet: "Ontdek de 12e-eeuwse waterburcht, kinderboerderij en middeleeuwse spelen voor de hele familie.",
+url: "https://www.lanaken.be/toerisme"
+},
+{
+id: 106,
+title: "Valkenburg aan de Geul: Openlucht Ridderspektakel & Vuurshow",
+location: "Grendelplein / Kasteelruïne Valkenburg",
+timeLabel: "Dit Weekend • Zaterdag 21:00",
+period: "weekend",
+regionTag: "Valkenburg",
+price: "€ 12,50",
+image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=700&q=80",
+snippet: "Magische vuurspuwers, verlichte kasteelmuren en akoestische middeleeuwse folkmuziek hoog boven het Geuldal.",
+url: "https://www.visitzuidlimburg.nl/agenda/"
+},
+{
+id: 107,
+title: "Meerssen: Orgelconcert & Barokmiddag in de Basiliek",
+location: "Markt 37, Basiliek van het H. Sacrament",
+timeLabel: "Dit Weekend • Zondag 15:00 uur",
+period: "weekend",
+regionTag: "Meerssen",
+price: "Gratis (deurcollecte)",
+image: "https://images.unsplash.com/photo-1548625361-16a75095d909?auto=format&fit=crop&w=700&q=80",
+snippet: "Geniet van de magistrale akoestiek in het gotische pronkstuk van Meerssen met meesterwerken van Bach.",
+url: "https://www.meerssen.nl"
+},
+{
+id: 108,
+title: "Schuttersfeest Bond Gerardus: Optocht & Schietwedstrijden",
+location: "Schuttersterrein Gronsveld",
+timeLabel: "Komende Week • Donderdag 13:00",
+period: "week",
+regionTag: "Verenigingen",
+price: "Gratis",
+image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=700&q=80",
+snippet: "Kleurrijke historische optocht van meer dan 20 Zuid-Limburgse schutterijen in vol ornaat met vaandels en buksen.",
+url: "https://www.denieuwestermaastricht.nl/"
+},
+{
+id: 109,
+title: "Riemst (BE): Brug van Vroenhoven Expo & Streekwijnen",
+location: "Maastrichtersteenweg 212, Vroenhoven",
+timeLabel: "Komende Week • Woensdag t/m Zondag",
+period: "week",
+regionTag: "Riemst",
+price: "€ 8,00",
+image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=700&q=80",
+snippet: "Beleef de opening van de Tweede Wereldoorlog en ontdek de geheimen van het Albertkanaal en Haspengouwse wijnen.",
+url: "https://www.riemst.be/nl/ontdekken/bezienswaardigheden/de-brug-van-vroenhoven"
+}
+];
+​let currentTab = 'nieuws';
+let currentNewsFilter = 'alles';
+let currentAgendaFilter = 'alles';
+let searchQuery = '';
+​function render() {
+if (currentTab === 'nieuws') {
+renderNews();
+} else {
+renderAgenda();
+}
+​const badge = document.getElementById('activeSearchBadge');
+const badgeText = document.getElementById('activeSearchText');
+if (searchQuery.trim().length > 0) {
+badge.style.display = 'flex';
+badgeText.textContent = Zoekresultaten voor: "${searchQuery}";
+} else {
+badge.style.display = 'none';
+}
+}
+​function renderNews() {
+const listEl = document.getElementById('newsList');
+​let filtered = newsData.filter(item => {
+const matchFilter = (currentNewsFilter === 'alles') || (item.category === currentNewsFilter);
+const q = searchQuery.toLowerCase();
+const matchSearch = !q || item.title.toLowerCase().includes(q) || item.snippet.toLowerCase().includes(q) || item.source.toLowerCase().includes(q) || item.locationTag.toLowerCase().includes(q);
+return matchFilter && matchSearch;
+});
+​if (filtered.length === 0) {
+listEl.innerHTML = '<div style="text-align:center; padding:40px 10px; color:#64748b;">Geen berichten gevonden voor deze selectie.</div>';
+return;
+}
+​let html = '';
+for (let i = 0; i < filtered.length; i++) {
+const it = filtered[i];
+const isLoos = it.source === 'Wat is loos in Mestreech';
+const isStare = it.source === 'De Nieuwe Ster';
+const isAnimal = it.category === 'Vermist dier';
+​let borderClass = '';
+if (isAnimal) borderClass = 'animal-border';
+else if (isLoos) borderClass = 'loos-border';
+else if (isStare) borderClass = 'stare-border';
+​let badgeClass = '';
+let iconPrefix = '';
+if (isAnimal) {
+badgeClass = 'animal';
+iconPrefix = '🐾 ';
+} else if (isLoos) {
+badgeClass = 'loos';
+iconPrefix = '⚡ ';
+} else if (isStare) {
+badgeClass = 'stare';
+iconPrefix = '★ ';
+}
+​html += <div class="feed-card ${borderClass}" onclick="openInlineViewer('${it.url}', '${escapeHtml(it.title)}')"> <div class="card-img-wrap"> <img src="${it.image}" alt="${escapeHtml(it.title)}" loading="lazy"> <div class="card-img-overlay"> <span class="badge ${badgeClass}">${iconPrefix}${it.source}</span> </div> <span class="card-img-time">🕒 ${it.time}</span> </div> <div class="card-body"> <div class="card-title">${it.title}</div> <div class="card-snippet">${it.snippet}</div> <div class="card-footer"> <span>📍 ${it.locationTag}</span> <button class="btn-share" onclick="shareItem(event, '${escapeHtml(it.title)}', '${it.url}')" title="Deel dit bericht"> <span>Delen</span> ➦ </button> </div> </div> </div>;
+}
+listEl.innerHTML = html;
+}
+​function renderAgenda() {
+const listEl = document.getElementById('agendaList');
+​let filtered = agendaData.filter(item => {
+let matchFilter = false;
+if (currentAgendaFilter === 'alles') {
+matchFilter = true;
+} else if (['vandaag', 'morgen', 'weekend', 'week'].includes(currentAgendaFilter)) {
+matchFilter = item.period === currentAgendaFilter;
+} else {
+matchFilter = (item.regionTag === currentAgendaFilter);
+}
+​const q = searchQuery.toLowerCase();
+const matchSearch = !q || item.title.toLowerCase().includes(q) || item.location.toLowerCase().includes(q) || item.regionTag.toLowerCase().includes(q) || item.snippet.toLowerCase().includes(q);
+return matchFilter && matchSearch;
+});
+​if (filtered.length === 0) {
+listEl.innerHTML = '<div style="text-align:center; padding:40px 10px; color:#64748b;">Geen activiteiten gevonden in de callepin.</div>';
+return;
+}
+​let html = '';
+for (let i = 0; i < filtered.length; i++) {
+const it = filtered[i];
+const isBelgie = it.regionTag === 'Riemst' || it.regionTag === 'Lanaken';
+const isVereniging = it.regionTag === 'Verenigingen';
+let tagClass = 'region';
+if (isBelgie) tagClass = 'region';
+if (isVereniging) tagClass = 'vereniging';
+​html += <div class="feed-card" onclick="openInlineViewer('${it.url}', '${escapeHtml(it.title)}')"> <div class="card-img-wrap"> <img src="${it.image}" alt="${escapeHtml(it.title)}" loading="lazy"> <div class="card-img-overlay"> <span class="badge ${tagClass}">${it.regionTag}</span> </div> <span class="card-img-time" style="color:var(--gold); font-weight:800;">${it.price}</span> </div> <div class="card-body"> <div class="card-title">${it.title}</div> <div style="font-size:12px; color:var(--gold); font-weight:800; margin-bottom:4px;">🕒 ${it.timeLabel}</div> <div class="card-snippet">${it.snippet}</div> <div class="card-footer"> <span>📍 ${it.location}</span> <button class="btn-share" onclick="shareItem(event, '${escapeHtml(it.title)}', '${it.url}')" title="Deel dit agendapunt"> <span>Delen</span> ➦ </button> </div> </div> </div>;
+}
+listEl.innerHTML = html;
+}
+​/* Direct native delen */
+function shareItem(event, title, url) {
+event.stopPropagation();
+if (navigator.share) {
+navigator.share({
+title: title,
+text: ${title} – Gevonden op Mestreech Vendaog:\n,
+url: url
+}).catch(() => {});
+} else {
+navigator.clipboard.writeText(${title} - ${url});
+alert("Link gekopieerd naar klembord!");
+}
+}
+​/* Slimme inline viewer die blokkades zoals Amivedi direct afvangt */
+function openInlineViewer(url, title) {
+const container = document.getElementById('iframeContainer');
+const frame = document.getElementById('inAppFrame');
+const fallbackBox = document.getElementById('iframeFallbackBox');
+const titleEl = document.getElementById('frameTitle');
+const urlEl = document.getElementById('frameUrl');
+const extLink = document.getElementById('frameExtLink');
+const fallbackBtn = document.getElementById('fallbackOpenBtn');
+​titleEl.textContent = title || "Origineel bericht";
+urlEl.textContent = url;
+extLink.href = url;
+fallbackBtn.href = url;
+​// Sites waarvan bekend is dat ze X-Frame-Options blokkeren
+if (url.includes('amivedi.nl') || url.includes('facebook.com') || url.includes('twitter.com')) {
+frame.style.display = 'none';
+fallbackBox.style.display = 'flex';
+} else {
+frame.style.display = 'block';
+fallbackBox.style.display = 'none';
+frame.src = url;
+}
+​container.className = 'open';
+}
+​function closeInlineViewer() {
+const container = document.getElementById('iframeContainer');
+const frame = document.getElementById('inAppFrame');
+const fallbackBox = document.getElementById('iframeFallbackBox');
+container.className = '';
+frame.src = 'about:blank';
+fallbackBox.style.display = 'none';
+}
+​/* Snel naar Dierenbescherming Maastricht e.o. filter */
+function openAnimalHub() {
+setTab('nieuws');
+setNewsFilter('Vermist dier');
+}
+​/* Zoekglas pop-up functies */
+function openSearch() {
+const overlay = document.getElementById('searchOverlay');
+const input = document.getElementById('popupSearchInput');
+overlay.className = 'open';
+input.focus();
+}
+​function closeSearch() {
+document.getElementById('searchOverlay').className = '';
+}
+​function resetSearch() {
+searchQuery = '';
+document.getElementById('popupSearchInput').value = '';
+render();
+}
+​function onSearchChange(val) {
+searchQuery = val;
+render();
+}
+​function setTab(tab) {
+currentTab = tab;
+const newsList = document.getElementById('newsList');
+const agendaList = document.getElementById('agendaList');
+const newsFilters = document.getElementById('newsFilters');
+const agendaFilters = document.getElementById('agendaFilters');
+const btnNews = document.getElementById('btnTabNews');
+const btnAgenda = document.getElementById('btnTabAgenda');
+const navNews = document.getElementById('navNews');
+const navAgenda = document.getElementById('navAgenda');
+​if (tab === 'nieuws') {
+newsList.style.display = 'flex';
+agendaList.style.display = 'none';
+newsFilters.style.display = 'flex';
+agendaFilters.style.display = 'none';
+​btnNews.className = 'tab-btn active-news';
+btnAgenda.className = 'tab-btn';
+navNews.className = 'nav-btn active';
+navAgenda.className = 'nav-btn';
+} else {
+newsList.style.display = 'none';
+agendaList.style.display = 'flex';
+newsFilters.style.display = 'none';
+agendaFilters.style.display = 'flex';
+​btnNews.className = 'tab-btn';
+btnAgenda.className = 'tab-btn active-agenda';
+navNews.className = 'nav-btn';
+navAgenda.className = 'nav-btn active-gold';
+}
+render();
+}
+​function setNewsFilter(category, btnElement) {
+currentNewsFilter = category;
+const pills = document.querySelectorAll('#newsFilters .pill');
+pills.forEach(p => {
+if (p.textContent.includes(category) || (category === 'alles' && p.textContent.includes('Alles'))) {
+p.className = 'pill active-pill-news';
+} else {
+p.className = 'pill';
+}
+});
+render();
+}
+​function setAgendaFilter(filterVal, btnElement) {
+currentAgendaFilter = filterVal;
+const pills = document.querySelectorAll('#agendaFilters .pill');
+pills.forEach(p => p.className = 'pill');
+if (btnElement) {
+btnElement.className = 'pill active-pill-agenda';
+} else {
+pills[0].className = 'pill active-pill-agenda';
+}
+render();
+}
+​function testNotification() {
+const alerts = [
+{
+sub: "🐾 Dierenbescherming Limburg",
+title: "Hond vermist in Malberg / Florijnruwe!",
+body: "Gesignaleerd nabij het groengebied. Kijk mee uit.",
+url: "https://mijndieriszoek.dierenbescherming.nl/vermiste-dieren/honden?location=Maastricht"
+},
+{
+sub: "🚨 112 P2000 Maastricht",
+title: "Brandweer met spoed naar Céramique",
+body: "Melding automatische brandmelder. Hulpdiensten onderweg.",
+url: "https://www.stadindex.nl/112/maastricht"
+},
+{
+sub: "⚡ Wat is loos in Mestreech",
+title: "Kettingbotsing A2 Maastricht - Eindhoven",
+body: "Snelweg tijdelijk dicht. Hulpdiensten ter plaatse.",
+url: "https://watisloos.nl/"
+}
+];
+const chosen = alerts[Math.floor(Math.random() * alerts.length)];
+​const toast = document.getElementById('toast');
+document.getElementById('toastSub').textContent = chosen.sub;
+document.getElementById('toastTitle').textContent = chosen.title;
+document.getElementById('toastBody').textContent = chosen.body;
+toast.onclick = function() {
+hideToast();
+openInlineViewer(chosen.url, chosen.title);
+};
+​toast.className = 'active';
+​setTimeout(() => {
+hideToast();
+}, 5000);
+}
+​function hideToast() {
+document.getElementById('toast').className = '';
+}
+​function escapeHtml(str) {
+if (!str) return '';
+return str.replace(/'/g, "\'").replace(/"/g, '"');
+}
+​render();
+</script>
+</body>
+</html>
