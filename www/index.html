@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -25,6 +24,7 @@
             --sub: #94a3b8;
             --loos-orange: #ff6b00;
             --alert-red: #ef4444;
+            --animal-teal: #14b8a6;
         }
 
         body {
@@ -211,7 +211,7 @@
             box-shadow: 0 0 10px rgba(200, 16, 46, 0.25);
         }
 
-        /* Tabs */
+        /* Tabs met Mestreechse benamingen */
         .tab-box {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -226,12 +226,16 @@
             background: transparent;
             border: none;
             color: var(--sub);
-            padding: 8px 0;
+            padding: 9px 0;
             font-size: 12px;
             font-weight: 800;
             border-radius: 9px;
             cursor: pointer;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
         .tab-btn.active-news {
             background-color: var(--red);
@@ -242,7 +246,7 @@
             color: #090d16;
         }
 
-        /* Zoekbalk Modal / Overlay */
+        /* Uitklapbaar Zoekvenster */
         #searchOverlay {
             display: none;
             position: fixed;
@@ -368,10 +372,13 @@
         .feed-card.stare-border {
             border-color: rgba(255, 199, 44, 0.5);
         }
+        .feed-card.animal-border {
+            border-color: rgba(20, 184, 166, 0.6);
+        }
 
         .card-img-wrap {
             width: 100%;
-            height: 150px;
+            height: 155px;
             position: relative;
             background-color: #1e293b;
         }
@@ -394,7 +401,7 @@
             position: absolute;
             bottom: 8px;
             right: 8px;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.72);
             color: #f1f5f9;
             font-size: 10px;
             font-weight: 700;
@@ -423,7 +430,7 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
         .card-footer {
@@ -433,8 +440,29 @@
             font-size: 11px;
             color: var(--gold);
             font-weight: 700;
-            border-top: 1px solid rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255,255,255,0.06);
             padding-top: 8px;
+        }
+
+        /* Deelknop per bericht */
+        .btn-share {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #cbd5e1;
+            padding: 4px 9px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-share:active {
+            background: var(--gold);
+            color: #090d16;
+            border-color: var(--gold);
         }
 
         .badge {
@@ -454,6 +482,11 @@
             background-color: rgba(255, 199, 44, 0.9);
             color: #000;
             font-weight: 900;
+        }
+        .badge.animal {
+            background-color: rgba(20, 184, 166, 0.9);
+            color: #fff;
+            font-weight: 800;
         }
         .badge.region {
             background-color: rgba(56, 189, 248, 0.85);
@@ -570,6 +603,7 @@
         }
         .nav-btn.active { color: var(--red); }
         .nav-btn.active-gold { color: var(--gold); }
+        .nav-btn.animal { color: var(--animal-teal); font-weight: 800; }
         .nav-btn.alert { color: var(--alert-red); font-weight: 800; }
     </style>
 </head>
@@ -587,10 +621,10 @@
             </div>
         </div>
 
-        <!-- Uitklapbaar Zoekvenster (Bedient via Zoekglas beneden) -->
+        <!-- Uitklapbaar Zoekvenster -->
         <div id="searchOverlay">
             <div class="search-inner">
-                <input type="text" id="popupSearchInput" placeholder="Zoek op trefwoord, buurt of gemeente..." oninput="onSearchChange(this.value)">
+                <input type="text" id="popupSearchInput" placeholder="Zoek op trefwoord, buurt, dier of gemeente..." oninput="onSearchChange(this.value)">
                 <button onclick="closeSearch()">✕ Sluiten</button>
             </div>
         </div>
@@ -626,15 +660,20 @@
                 </div>
             </div>
 
-            <!-- Tab Switcher -->
+            <!-- Tab Switcher met Mestreechse benamingen -->
             <div class="tab-box">
-                <button id="btnTabNews" class="tab-btn active-news" onclick="setTab('nieuws')">📰 Mestreechs Nieuws</button>
-                <button id="btnTabAgenda" class="tab-btn" onclick="setTab('agenda')">📅 Agenda & Regio</button>
+                <button id="btnTabNews" class="tab-btn active-news" onclick="setTab('nieuws')">
+                    <span>📰</span> Mestreechs Nuijts
+                </button>
+                <button id="btnTabAgenda" class="tab-btn" onclick="setTab('agenda')">
+                    <span>📒</span> Callepin
+                </button>
             </div>
 
-            <!-- Nieuws Filters -->
+            <!-- Filters voor Nieuws -->
             <div id="newsFilters" class="pill-row">
                 <button class="pill active-pill-news" onclick="setNewsFilter('alles', this)">🔥 Alles</button>
+                <button class="pill" onclick="setNewsFilter('Vermist dier', this)">🐾 Vermiste Diere</button>
                 <button class="pill" onclick="setNewsFilter('Wat is loos', this)">⚡ Wat is Loos</button>
                 <button class="pill" onclick="setNewsFilter('De Nieuwe Ster', this)">⭐ De Nieuwe Ster</button>
                 <button class="pill" onclick="setNewsFilter('De Limburger', this)">📰 De Limburger</button>
@@ -643,7 +682,7 @@
                 <button class="pill" onclick="setNewsFilter('Gemeente', this)">🏛️ Gemeente & 112</button>
             </div>
 
-            <!-- Agenda Filters -->
+            <!-- Filters voor Callepin (Agenda) -->
             <div id="agendaFilters" class="pill-row" style="display:none;">
                 <button class="pill active-pill-agenda" onclick="setAgendaFilter('alles', this)">📅 Alles</button>
                 <button class="pill" onclick="setAgendaFilter('vandaag', this)">⚡ Vandaag</button>
@@ -669,14 +708,14 @@
         <div id="newsList" class="content-wrap"></div>
         <div id="agendaList" class="content-wrap" style="display:none;"></div>
 
-        <!-- In-App Inline Frame Viewer (Voor 112 en originele artikelen) -->
+        <!-- In-App Inline Frame Viewer (Voor 112, Amivedi en artikelen) -->
         <div id="iframeContainer">
             <div class="iframe-toolbar">
                 <button class="btn-toolbar btn-close-viewer" onclick="closeInlineViewer()">
                     ✕ Sluiten
                 </button>
                 <div class="iframe-info">
-                    <div id="frameTitle" class="iframe-title">Origineel bericht laden...</div>
+                    <div id="frameTitle" class="iframe-title">Laden...</div>
                     <div id="frameUrl" class="iframe-url">https://...</div>
                 </div>
                 <a id="frameExtLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-toolbar btn-ext-link" title="Open in externe browser">
@@ -686,36 +725,36 @@
             <iframe id="inAppFrame" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
         </div>
 
-        <!-- Bottom Bar: Nuie Stare & Wat is Loos vervangen door Zoeken & 112 -->
+        <!-- Bottom Bar: Mestreechs Nuijts, Callepin, Zoeken, 112 & Vermiste Dieren -->
         <nav class="bottom-bar">
-            <!-- 1. Nieuws -->
+            <!-- 1. Mestreechs Nuijts -->
             <button id="navNews" class="nav-btn active" onclick="setTab('nieuws'); setNewsFilter('alles')">
                 <span style="font-size:17px;">📰</span>
-                <span>Nieuws</span>
+                <span>Nuijts</span>
             </button>
 
-            <!-- 2. Agenda -->
+            <!-- 2. Callepin -->
             <button id="navAgenda" class="nav-btn" onclick="setTab('agenda')">
-                <span style="font-size:17px;">📅</span>
-                <span>Agenda</span>
+                <span style="font-size:17px;">📒</span>
+                <span>Callepin</span>
             </button>
 
-            <!-- 3. Zoekglas knop ipv vast veld -->
+            <!-- 3. Vermiste Huisdieren (Amivedi / Dierenambulance Maastricht) -->
+            <button class="nav-btn animal" onclick="openInlineViewer('https://www.amivedi.nl/vermist/', '🐾 Amivedi: Vermiste & Gevonden Dieren Maastricht')" title="Vermiste Huisdieren">
+                <span style="font-size:17px;">🐾</span>
+                <span>Diere</span>
+            </button>
+
+            <!-- 4. Zoekglas -->
             <button class="nav-btn" onclick="openSearch()" title="Zoeken">
                 <span style="font-size:17px;">🔍</span>
                 <span>Zoeken</span>
             </button>
 
-            <!-- 4. 112 Maastricht direct naar Stadindex -->
+            <!-- 5. 112 Maastricht direct naar Stadindex -->
             <button class="nav-btn alert" onclick="openInlineViewer('https://www.stadindex.nl/112/maastricht', '🚨 112 Meldingen Maastricht (P2000)')" title="112 Maastricht">
                 <span style="font-size:17px;">🚨</span>
                 <span>112 Melding</span>
-            </button>
-
-            <!-- 5. Meldingen Test -->
-            <button class="nav-btn" onclick="testNotification()">
-                <span style="font-size:17px;">🔔</span>
-                <span>Melding</span>
             </button>
         </nav>
 
@@ -725,80 +764,91 @@
         const newsData = [
             {
                 id: 1,
+                title: "🐾 Amivedi Maastricht: Kat 'Milo' (cypers-wit) vermist in Wyck",
+                source: "Amivedi Maastricht",
+                url: "https://www.amivedi.nl/vermist/",
+                category: "Vermist dier",
+                time: "25 min geleden",
+                image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=700&q=80",
+                snippet: "Sinds gisteravond niet meer thuisgekomen nabij de Rechtstraat. Draagt een rood bandje en is gechipt. Ziet u Milo? Bel direct Amivedi.",
+                locationTag: "Wyck"
+            },
+            {
+                id: 2,
+                title: "🐾 Dierenambulance Limburg: Hond 'Bowie' (Golden Retriever) gevonden in Heer",
+                source: "Dierenambulance",
+                url: "https://dalz.nl/vermist-gevonden/",
+                category: "Vermist dier",
+                time: "45 min geleden",
+                image: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=700&q=80",
+                snippet: "Loslopend aangetroffen bij het sportpark. Maakt het goed en verblijft nu tijdelijk veilig bij de opvang. Baasje dringend gezocht!",
+                locationTag: "Heer"
+            },
+            {
+                id: 3,
                 title: "Wat is loos in Mestreech: Kettingbotsing met drie voertuigen op A2 richting Eindhoven",
                 source: "Wat is loos in Mestreech",
                 url: "https://watisloos.nl/",
                 category: "Wat is loos",
-                time: "15 min geleden",
+                time: "1 uur geleden",
                 image: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=700&q=80",
                 snippet: "Snelweg tijdelijk afgesloten na zware aanrijding tussen meerdere wagens. Hulpdiensten en bergingsbedrijven zijn massaal ter plaatse.",
                 locationTag: "A2 Maastricht"
             },
             {
-                id: 2,
+                id: 4,
                 title: "Wat is loos in Mestreech: Politie rukt uit voor personen met bivakmutsen op flatgalerij",
                 source: "Wat is loos in Mestreech",
                 url: "https://watisloos.nl/",
                 category: "Wat is loos",
-                time: "50 min geleden",
+                time: "2 uur geleden",
                 image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=700&q=80",
                 snippet: "Meerdere patrouilles en hondengeleiders omsingelden het wooncomplex na verontrustende meldingen van omwonenden.",
                 locationTag: "Malberg"
             },
             {
-                id: 3,
+                id: 5,
                 title: "De Nieuwe Ster: Ondernemers Wyck bezorgd over bereikbaarheid en parkeerplannen",
                 source: "De Nieuwe Ster",
                 url: "https://www.denieuwestermaastricht.nl/",
                 category: "De Nieuwe Ster",
-                time: "1 uur geleden",
+                time: "3 uur geleden",
                 image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=700&q=80",
                 snippet: "Winkeliers en horeca in de Rechtstraat vrezen omzetverlies door nieuwe gemeentelijke venstertijden en verkeersknipsels.",
                 locationTag: "Wyck"
             },
             {
-                id: 4,
+                id: 6,
                 title: "De Nieuwe Ster: Verhalen uit de wijken – Hoe levend is 't Mestreechs dialek?",
                 source: "De Nieuwe Ster",
                 url: "https://www.denieuwestermaastricht.nl/",
                 category: "De Nieuwe Ster",
-                time: "2 uur geleden",
+                time: "4 uur geleden",
                 image: "https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?auto=format&fit=crop&w=700&q=80",
-                snippet: "Een diepgaand portret over jongeren, carnavalsverenigingen en de toekomst van de Maastrichtse moedertaal in een internationale universiteitsstad.",
+                snippet: "Een diepgaand portret over jongeren, verenigingen en de toekomst van de Maastrichtse moedertaal in een internationale universiteitsstad.",
                 locationTag: "Cultuur"
             },
             {
-                id: 5,
-                title: "Vrijthof maakt zich op voor André Rieu zomerconcerten: opbouw van start",
+                id: 7,
+                title: "Vrijthof maakt zich op voor André Rieu concerten: opbouw van start",
                 source: "De Limburger",
                 url: "https://www.delimburger.nl/regio/maastricht",
                 category: "De Limburger",
-                time: "3 uur geleden",
+                time: "5 uur geleden",
                 image: "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=700&q=80",
                 snippet: "Het grootste openluchtpodium van Nederland verrijst op het Vrijthof. Horecaondernemers zetten tienduizenden extra stoelen klaar.",
                 locationTag: "Vrijthof"
             },
             {
-                id: 6,
+                id: 8,
                 title: "L1 / RTV Maastricht: Live debat over de Maasboulevard en verkeersstromen",
                 source: "L1 / RTV",
                 url: "https://www.rtvmaastricht.nl",
                 category: "L1 / RTV",
-                time: "4 uur geleden",
+                time: "6 uur geleden",
                 image: "https://images.unsplash.com/photo-1577495508048-b635879837f1?auto=format&fit=crop&w=700&q=80",
                 snippet: "Wethouders en bezorgde bewonersgroepen gingen fel in discussie over sluipverkeer tussen Céramique en de binnenstad.",
                 locationTag: "Centrum"
-            },
-            {
-                id: 7,
-                title: "Gemeente Maastricht: Restauratie historische kasseien Markt en Stadhuis",
-                source: "Gemeente",
-                url: "https://www.gemeentemaastricht.nl",
-                category: "Gemeente",
-                time: "5 uur geleden",
-                image: "https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=700&q=80",
-                snippet: "Vaklieden herstellen verzakkingen rond het monumentale plein. De traditionele weekmarkt blijft gedurende de werkzaamheden toegankelijk.",
-                locationTag: "Markt"
             }
         ];
 
@@ -946,7 +996,7 @@
             });
 
             if (filtered.length === 0) {
-                listEl.innerHTML = '<div style="text-align:center; padding:40px 10px; color:#64748b;">Geen nieuws gevonden voor deze zoekopdracht.</div>';
+                listEl.innerHTML = '<div style="text-align:center; padding:40px 10px; color:#64748b;">Geen berichten gevonden voor deze selectie.</div>';
                 return;
             }
 
@@ -955,9 +1005,25 @@
                 const it = filtered[i];
                 const isLoos = it.source === 'Wat is loos in Mestreech';
                 const isStare = it.source === 'De Nieuwe Ster';
-                const borderClass = isLoos ? 'loos-border' : (isStare ? 'stare-border' : '');
-                const badgeClass = isLoos ? 'loos' : (isStare ? 'stare' : '');
-                const iconPrefix = isLoos ? '⚡ ' : (isStare ? '★ ' : '');
+                const isAnimal = it.category === 'Vermist dier';
+                
+                let borderClass = '';
+                if (isAnimal) borderClass = 'animal-border';
+                else if (isLoos) borderClass = 'loos-border';
+                else if (isStare) borderClass = 'stare-border';
+
+                let badgeClass = '';
+                let iconPrefix = '';
+                if (isAnimal) {
+                    badgeClass = 'animal';
+                    iconPrefix = '🐾 ';
+                } else if (isLoos) {
+                    badgeClass = 'loos';
+                    iconPrefix = '⚡ ';
+                } else if (isStare) {
+                    badgeClass = 'stare';
+                    iconPrefix = '★ ';
+                }
 
                 html += `
                     <div class="feed-card ${borderClass}" onclick="openInlineViewer('${it.url}', '${escapeHtml(it.title)}')">
@@ -973,7 +1039,9 @@
                             <div class="card-snippet">${it.snippet}</div>
                             <div class="card-footer">
                                 <span>📍 ${it.locationTag}</span>
-                                <span>Lees origineel in app ➔</span>
+                                <button class="btn-share" onclick="shareItem(event, '${escapeHtml(it.title)}', '${it.url}')" title="Deel dit bericht">
+                                    <span>Delen</span> ➦
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1001,7 +1069,7 @@
             });
 
             if (filtered.length === 0) {
-                listEl.innerHTML = '<div style="text-align:center; padding:40px 10px; color:#64748b;">Geen activiteiten gevonden voor deze selectie.</div>';
+                listEl.innerHTML = '<div style="text-align:center; padding:40px 10px; color:#64748b;">Geen activiteiten gevonden in de callepin.</div>';
                 return;
             }
 
@@ -1029,7 +1097,9 @@
                             <div class="card-snippet">${it.snippet}</div>
                             <div class="card-footer">
                                 <span>📍 ${it.location}</span>
-                                <span>Programma & info ➔</span>
+                                <button class="btn-share" onclick="shareItem(event, '${escapeHtml(it.title)}', '${it.url}')" title="Deel dit agendapunt">
+                                    <span>Delen</span> ➦
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1038,7 +1108,22 @@
             listEl.innerHTML = html;
         }
 
-        /* Direct in-app openen zonder de app te verlaten (werkt ook voor Stadindex 112) */
+        /* Direct native delen (Web Share API op Android Pixel) */
+        function shareItem(event, title, url) {
+            event.stopPropagation(); // Voorkomt dat de inline viewer ongewenst meemoppt
+            if (navigator.share) {
+                navigator.share({
+                    title: title,
+                    text: `${title} – Gevonden op Mestreech Vendaog:\n`,
+                    url: url
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(`${title} - ${url}`);
+                alert("Link gekopieerd naar klembord!");
+            }
+        }
+
+        /* Direct in-app openen zonder de app te verlaten */
         function openInlineViewer(url, title) {
             const container = document.getElementById('iframeContainer');
             const frame = document.getElementById('inAppFrame');
@@ -1147,22 +1232,22 @@
         function testNotification() {
             const alerts = [
                 { 
+                    sub: "🐾 Amivedi Maastricht",
+                    title: "Kat 'Milo' vermist in Wyck!", 
+                    body: "Cypers-wit met rood halsbandje. Kijk mee uit in de buurt.", 
+                    url: "https://www.amivedi.nl/vermist/" 
+                },
+                { 
                     sub: "🚨 112 P2000 Maastricht",
                     title: "Brandweer met spoed naar Céramique", 
                     body: "Melding automatische brandmelder. Hulpdiensten onderweg.", 
                     url: "https://www.stadindex.nl/112/maastricht" 
                 },
                 { 
-                    sub: "⚡ Wat is loos in Mestreech: 112 Eilmeldung",
+                    sub: "⚡ Wat is loos in Mestreech",
                     title: "Kettingbotsing A2 Maastricht - Eindhoven", 
                     body: "Snelweg tijdelijk dicht. Hulpdiensten ter plaatse.", 
                     url: "https://watisloos.nl/" 
-                },
-                { 
-                    sub: "⭐ De Nieuwe Ster: Wyck",
-                    title: "Ondernemers luiden noodklok over parkeren", 
-                    body: "Lees de reportage over de Rechtstraat in Wyck.", 
-                    url: "https://www.denieuwestermaastricht.nl/" 
                 }
             ];
             const chosen = alerts[Math.floor(Math.random() * alerts.length)];
@@ -1196,4 +1281,3 @@
     </script>
 </body>
 </html>
-```
