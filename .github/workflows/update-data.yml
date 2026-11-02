@@ -1,26 +1,24 @@
-name: Update Live Nieuws Data
+name: Update Live Data
 ​on:
 schedule:
-- cron: '0 * * * *' # Elk uur automatisch
-workflow_dispatch:     # Handmatig op 'Run' kunnen drukken
+- cron: '0 * * * *'
+workflow_dispatch:
 ​permissions:
-contents: write       # Geeft de server toestemming om news_data.json op te slaan
+contents: write
 ​jobs:
 scrape:
 runs-on: ubuntu-latest
 steps:
-- name: Code ophalen
-uses: actions/checkout@v4
-​- name: Node.js instellen
-uses: actions/setup-node@v4
+- uses: actions/checkout@v4
+​- uses: actions/setup-node@v4
 with:
 node-version: 20
-​- name: Scraper uitvoeren
+​- name: Run
 run: node scripts/scraper.js
-​- name: Wijzigingen opslaan in GitHub
+​- name: Push
 run: |
-git config --global user.name "Mestreech Bot"
-git config --global user.email "bot@mestreechvendaog.nl"
+git config user.name "bot"
+git config user.email "bot@test.com"
 git add www/news_data.json
-git commit -m "Auto-update nieuws data [skip ci]" || echo "Geen nieuwe wijzigingen"
+git commit -m "update" || exit 0
 git push
