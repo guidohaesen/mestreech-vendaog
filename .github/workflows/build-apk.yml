@@ -8,34 +8,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-
-      - name: Build Project
-        run: |
-          npm install
-          npx cap add android || true
-          npx cap sync android
-
-      - name: Compile APK
-        run: |
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
-
-      - name: Save APK
-        uses: actions/upload-artifact@v4
+      - run: npm install && node scripts/scraper.js || true
+      - run: npx cap add android || true
+      - run: npx cap sync android
+      - run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
         with:
           name: Mestreech-Vendaog-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
