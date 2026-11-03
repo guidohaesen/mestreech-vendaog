@@ -24,11 +24,11 @@ jobs:
       - run: npx cap add android || true
       - run: npx cap sync android
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
-      - run: cp android/app/build/outputs/apk/debug/app-debug.apk Mestreech-Vendaog.apk
+      - run: cp android/app/build/outputs/apk/debug/app-debug.apk Mestreech-Vendaog-v${{ github.run_number }}.apk
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
-          name: Mestreech Vendaog Actuele Versie
-          files: Mestreech-Vendaog.apk
+          tag_name: v1.0.${{ github.run_number }}
+          name: Mestreech Vendaog v1.0.${{ github.run_number }}
+          files: Mestreech-Vendaog-v${{ github.run_number }}.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
