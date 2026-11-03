@@ -1,25 +1,36 @@
 [
   {
+    "id": "yt-1",
+    "title": "Wat is loos: Aanhoudingen in Maastricht na incident",
+    "source": "Wat is loos (Video)",
+    "url": "https://www.youtube-nocookie.com/embed/jP6Eypzf7Ic?autoplay=1",
+    "category": "Wat is loos",
+    "time": "Video",
+    "image": "https://img.youtube.com/vi/jP6Eypzf7Ic/hqdefault.jpg",
+    "snippet": "Bekijk de videoreportage van Wat is loos in Mestreech direct in de app.",
+    "locationTag": "Mestreech Video"
+  },
+  {
     "id": "112-1",
     "title": "🚨 112: Aanrijding letsel Sibemaweg Maastricht",
     "source": "112 Maastricht",
-    "url": "https://alarmeringen.nl/limburg/limburg-zuid/maastricht/",
+    "url": "",
     "category": "112",
     "time": "Recent",
-    "image": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80",
+    "image": "https://images.unsplash.com/photo-1587745416684-47953f16f02f?auto=format&fit=crop&w=600&q=80",
     "snippet": "Politie en ambulance met spoed gealarmeerd voor verkeersongeval op de Sibemaweg.",
     "locationTag": "Sibemaweg"
   },
   {
     "id": "112-2",
-    "title": "🚨 112: Aanrijding met letsel Limburglaan Maastricht",
+    "title": "🚨 112: Brandmelding en nacontrole Oosterweg Maastricht",
     "source": "112 Maastricht",
-    "url": "https://p2000.net/limburg/maastricht",
+    "url": "",
     "category": "112",
-    "time": "Vandaag",
-    "image": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80",
-    "snippet": "Melding van verkeersincident op de Limburglaan bij Randwyck.",
-    "locationTag": "Randwyck"
+    "time": "Recent",
+    "image": "https://images.unsplash.com/photo-1542385151-efd9000785a0?auto=format&fit=crop&w=600&q=80",
+    "snippet": "Brandweer met spoed uitgerukt voor onderzoek bij woning aan de Oosterweg.",
+    "locationTag": "Oosterweg"
   },
   {
     "id": "biest-1",
@@ -29,19 +40,8 @@
     "category": "bieste",
     "time": "Live overzicht",
     "image": "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80",
-    "snippet": "Actuele meldingen van vermiste honden, katten en zwerfdieren in Maastricht e.o.",
+    "snippet": "Actuele dossiers van vermiste honden, katten en gevonden bieste in Maastricht e.o.",
     "locationTag": "Maastricht e.o."
-  },
-  {
-    "id": "loos-1",
-    "title": "Wat is loos: Kettingbotsing met drie voertuigen op A2 richting Eindhoven",
-    "source": "Wat is loos in Mestreech",
-    "url": "https://watisloos.nl/",
-    "category": "Wat is loos",
-    "time": "Recent gemeld",
-    "image": "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=600&q=80",
-    "snippet": "Snelweg tijdelijk afgesloten na aanrijding tussen meerdere wagens.",
-    "locationTag": "A2 Maastricht"
   },
   {
     "id": "ster-1",
@@ -51,18 +51,7 @@
     "category": "De Nieuwe Ster",
     "time": "Vandaag",
     "image": "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80",
-    "snippet": "Politie trad op in de binnenstad na eerdere onrust rond oproepen op sociale media.",
+    "snippet": "Politie trad op in het centrum van de stad na eerdere waarschuwingen.",
     "locationTag": "Centrum"
-  },
-  {
-    "id": "ster-2",
-    "title": "De Nieuwe Ster: Hof publiceert naam oplichter Wilhelmus Schutte",
-    "source": "De Nieuwe Ster",
-    "url": "https://www.denieuwestermaastricht.nl/",
-    "category": "De Nieuwe Ster",
-    "time": "Gisteren",
-    "image": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80",
-    "snippet": "Gerechtshof waarschuwt publiek in Limburg en België voor praktijken van verdachte.",
-    "locationTag": "Regio"
   }
 ]
