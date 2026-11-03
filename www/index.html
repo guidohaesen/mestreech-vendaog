@@ -9,7 +9,6 @@
 body { background: #000; color: #f8fafc; display: flex; justify-content: center; min-height: 100vh; }
 #app { width: 100%; max-width: 600px; background: #090d16; min-height: 100vh; display: flex; flex-direction: column; position: relative; padding-bottom: 70px; }
 
-/* HEADER MET BEWEGENDE MAASTRICHTSE VLAG */
 header {
   position: sticky;
   top: 0;
@@ -20,7 +19,6 @@ header {
   box-shadow: 0 4px 22px rgba(0,0,0,0.65);
 }
 
-/* De echte fotovlag met subtiele golfbeweging */
 .header-flag-img {
   position: absolute;
   top: -10%;
@@ -35,7 +33,6 @@ header {
   animation: flagBreeze 8s ease-in-out infinite alternate;
 }
 
-/* Doekglans & verlooplaag voor optimale leesbaarheid */
 .header-overlay {
   position: absolute;
   inset: 0;
@@ -44,10 +41,7 @@ header {
   pointer-events: none;
 }
 
-.header-content {
-  position: relative;
-  z-index: 3;
-}
+.header-content { position: relative; z-index: 3; }
 
 @keyframes flagBreeze {
   0% { transform: scale(1) translate(0, 0); }
@@ -119,6 +113,7 @@ header {
 .badge.teal { background: #0d9488; }
 .badge.alert112 { background: #ef4444; color: #fff; font-weight: 900; }
 .badge.yt { background: #e11d48; color: #fff; font-weight: 900; }
+.badge.pol { background: #2563eb; color: #fff; font-weight: 900; }
 .card-time { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); color: #e2e8f0; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
 .card-body { padding: 10px 12px 12px; }
 .card-title { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 4px; line-height: 1.35; }
@@ -145,7 +140,6 @@ nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width:
 <div id="app">
 <div id="toast"></div>
 
-<!-- HEADER MET WAPPERENDE ACHTERGROND -->
 <header>
   <div class="header-flag-img"></div>
   <div class="header-overlay"></div>
@@ -162,7 +156,7 @@ nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width:
       <button id="tbA" onclick="setTab('agenda')" class="tab-btn">📒 Callepin</button>
     </div>
     <div class="search-box">
-      <input type="text" id="q" oninput="doSearch(this.value)" placeholder="Zoek in nieuws, Wyck, bieste, 112..." class="search-input">
+      <input type="text" id="q" oninput="doSearch(this.value)" placeholder="Zoek in nieuws, Wyck, bieste, politie, agenda..." class="search-input">
     </div>
   </div>
 </header>
@@ -174,7 +168,7 @@ nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width:
   <div class="v-bar">
     <button onclick="closeV()" class="v-close">✕ Sluiten</button>
     <span id="vTitle" class="v-title">Bericht</span>
-    <a id="vExt" href="#" target="_blank" class="v-ext">YouTube / Web ↗</a>
+    <a id="vExt" href="#" target="_blank" class="v-ext">Web / Link ↗</a>
   </div>
   <iframe id="frame" src="about:blank" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 </div>
@@ -190,9 +184,48 @@ nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width:
 <script>
 let news = [];
 
+// Echte actuele Maastrichtse uitjes & bereikbaarheid
 let agenda = [
-  { id: "c1", title: "Live Jazz op de Markt & Terrassen", loc: "Markt Maastricht", time: "Vandaag 19:30", price: "Gratis", img: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=600&q=80", url: "https://www.bezoekmaastricht.nl/uitagenda", txt: "Terrasconcert met Maastrichtse muzikanten." },
-  { id: "c2", title: "Riemst (BE): Geheimen van Mergelgrotten Kanne", loc: "Kanne (Riemst)", time: "Weekend 20:30", price: "€ 14,-", img: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80", url: "https://www.riemst.be", txt: "Avondrondleiding bij kaarslicht net over de grens." }
+  { 
+    id: "uit-1", 
+    title: "Theater aan het Vrijthof: Avondvoorstellingen & Cabaret", 
+    loc: "Vrijthof Zaal", 
+    time: "Deze week 20:00", 
+    price: "Tickets online", 
+    img: "https://images.unsplash.com/photo-1507676184212-d03ab07a01bf?auto=format&fit=crop&w=600&q=80", 
+    url: "https://www.uitmaastricht.com/evenement/?q=&where=alle&when=week&cat=alle", 
+    txt: "Bekijk het complete avondprogramma en voorstellingen via Uit in Maastricht." 
+  },
+  { 
+    id: "uit-2", 
+    title: "Maastricht Bereikbaar: Werkzaamheden & Evenementenoverzicht", 
+    loc: "Binnenstad & Ring", 
+    time: "Actueel", 
+    price: "Info", 
+    img: "https://images.unsplash.com/photo-1519074069444-1ba4ea16e6f9?auto=format&fit=crop&w=600&q=80", 
+    url: "https://www.maastrichtbereikbaar.nl/kom-ik-op-mijn-plek/agenda", 
+    txt: "Slimme reisroutes, parkeerdrukte en actuele agenda van Maastricht Bereikbaar." 
+  },
+  { 
+    id: "uit-3", 
+    title: "Muziekgieterij & Sphinxkwartier: Concerten en Expo", 
+    loc: "Sphinxkwartier", 
+    time: "Vrijdag & Weekend", 
+    price: "V.a. € 12,50", 
+    img: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=600&q=80", 
+    url: "https://allevents.in/maastricht/all", 
+    txt: "Live optredens, culturele bijeenkomsten en feesten in het industriële erfgoed." 
+  },
+  { 
+    id: "uit-4", 
+    title: "Antiek- en Brocantemarkt Markt & Boschstraat", 
+    loc: "Markt Maastricht", 
+    time: "Zondag 09:00 - 16:00", 
+    price: "Gratis", 
+    img: "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&w=600&q=80", 
+    url: "https://www.uitmaastricht.com/evenement/?q=&where=alle&when=week&cat=alle", 
+    txt: "Wekelijkse gezellige snuffelmarkt rondom het historische Stadhuis." 
+  }
 ];
 
 let curTab = "nieuws";
@@ -266,10 +299,11 @@ function renderN() {
     let catVal = (it.category || it.cat || "").toLowerCase();
     let is112 = catVal.includes("112") || (it.source && it.source.includes("112"));
     let isBiest = catVal.includes("biest") || catVal.includes("dier");
+    let isPol = it.source && it.source.includes("Politie");
     let isSter = it.source === "De Nieuwe Ster";
     let isYt = (it.source && it.source.includes("Video")) || (it.category === "Wat is loos");
 
-    let bCls = is112 ? "badge alert112" : (isBiest ? "badge teal" : (isYt ? "badge yt" : (isSter ? "badge gold" : "badge")));
+    let bCls = is112 ? "badge alert112" : (isPol ? "badge pol" : (isBiest ? "badge teal" : (isYt ? "badge yt" : (isSter ? "badge gold" : "badge"))));
     let safeT = (it.title || "").replace(/'/g, "");
     
     return `<div class="card" onclick="handleCardClick('${it.url || ""}', '${safeT}', ${is112})">
@@ -283,7 +317,7 @@ function renderN() {
         <div class="card-desc">${it.snippet || ""}</div>
         <div class="card-foot">
           <span>📍 ${it.locationTag || "Maastricht"}</span>
-          <button class="btn-share" onclick="doShare(event,'${safeT}','${it.url || "112 Maastricht Melding"}')">Delen ➦</button>
+          <button class="btn-share" onclick="doShare(event,'${safeT}','${it.url || "Mestreech Vendaog"}')">Delen ➦</button>
         </div>
       </div>
     </div>`;
@@ -293,7 +327,7 @@ function renderN() {
 function renderA() {
   let el = document.getElementById("agendaFeed");
   let q = query.toLowerCase();
-  let list = agenda.filter(it => !q || it.title.toLowerCase().includes(q) || it.loc.toLowerCase().includes(q));
+  let list = agenda.filter(it => !q || it.title.toLowerCase().includes(q) || it.loc.toLowerCase().includes(q) || it.txt.toLowerCase().includes(q));
   el.innerHTML = list.map(it => {
     let safeT = (it.title || "").replace(/'/g, "");
     return `<div class="card" onclick="openV('${it.url}','${safeT}')">
