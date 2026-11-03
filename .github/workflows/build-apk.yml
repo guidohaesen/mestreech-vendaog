@@ -17,6 +17,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
       - run: npm install
+      - run: node scripts/scraper.js || true
       - run: npx cap add android || true
       - run: npx cap sync android
       - run: cd android && chmod +x gradlew && ./gradlew assembleDebug --no-daemon
