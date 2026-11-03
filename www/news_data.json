@@ -1,5 +1,16 @@
 [
   {
+    "id": "pol-x-1",
+    "title": "Politie Limburg: Actuele updates en getuigenoproepen Maastricht",
+    "source": "Politie Limburg (X)",
+    "url": "https://x.com/POL_Limburg",
+    "category": "Politie",
+    "time": "Live feed",
+    "image": "https://images.unsplash.com/photo-1590483259972-c220f1885f8f?auto=format&fit=crop&w=600&q=80",
+    "snippet": "Bekijk de officiële politieberichten, vermissingen en incidenten via @POL_Limburg.",
+    "locationTag": "Regio Maastricht"
+  },
+  {
     "id": "yt-1",
     "title": "Wat is loos: Aanhoudingen in Maastricht na incident",
     "source": "Wat is loos (Video)",
