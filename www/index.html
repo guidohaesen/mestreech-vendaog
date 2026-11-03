@@ -9,27 +9,59 @@
 body { background: #000; color: #f8fafc; display: flex; justify-content: center; min-height: 100vh; }
 #app { width: 100%; max-width: 600px; background: #090d16; min-height: 100vh; display: flex; flex-direction: column; position: relative; padding-bottom: 70px; }
 
-/* HEADER MET ECHTE WAPPERENDE MAASTRICHTSE VLAG */
+/* HEADER MET BEWEGENDE MAASTRICHTSE VLAG */
 header {
   position: sticky;
   top: 0;
   z-index: 40;
-  background-color: #ba0c2f;
-  background-image: linear-gradient(180deg, rgba(10, 14, 23, 0.25) 0%, rgba(10, 14, 23, 0.75) 100%), url('https://images.unsplash.com/photo-1542385151-efd9000785a0?auto=format&fit=crop&w=800&q=80');
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   padding: 14px 14px 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+  box-shadow: 0 4px 22px rgba(0,0,0,0.65);
+}
+
+/* De echte fotovlag met subtiele golfbeweging */
+.header-flag-img {
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background-image: url('header-flag.jpg');
+  background-size: cover;
+  background-position: center left;
+  z-index: 1;
+  pointer-events: none;
+  animation: flagBreeze 8s ease-in-out infinite alternate;
+}
+
+/* Doekglans & verlooplaag voor optimale leesbaarheid */
+.header-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(180deg, rgba(8, 12, 22, 0.25) 0%, rgba(8, 12, 22, 0.78) 100%);
+  pointer-events: none;
+}
+
+.header-content {
+  position: relative;
+  z-index: 3;
+}
+
+@keyframes flagBreeze {
+  0% { transform: scale(1) translate(0, 0); }
+  50% { transform: scale(1.04) translate(-1.5%, 1.2%); }
+  100% { transform: scale(1.02) translate(1.2%, -1%); }
 }
 
 .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-.title { font-size: 20px; font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0,0,0,0.7); letter-spacing: -0.3px; line-height: 1.1; }
-.sub { font-size: 11px; color: #f1f5f9; text-shadow: 0 1px 4px rgba(0,0,0,0.8); font-weight: 600; margin-top: 2px; }
+.title { font-size: 20px; font-weight: 900; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8); letter-spacing: -0.3px; line-height: 1.1; }
+.sub { font-size: 11px; color: #f1f5f9; text-shadow: 0 1px 5px rgba(0,0,0,0.9); font-weight: 600; margin-top: 2px; }
 
 .btn-live { 
-  background: rgba(0,0,0,0.45); 
-  backdrop-filter: blur(8px); 
+  background: rgba(0,0,0,0.5); 
+  backdrop-filter: blur(10px); 
   border: 1px solid rgba(255,255,255,0.25); 
   color: #fff; 
   font-size: 11px; 
@@ -43,11 +75,11 @@ header {
   display: grid; 
   grid-template-columns: 1fr 1fr; 
   background: rgba(0,0,0,0.45); 
-  backdrop-filter: blur(10px); 
+  backdrop-filter: blur(12px); 
   padding: 3px; 
   border-radius: 12px; 
   gap: 4px; 
-  border: 1px solid rgba(255,255,255,0.15); 
+  border: 1px solid rgba(255,255,255,0.18); 
 }
 
 .tab-btn { 
@@ -61,14 +93,14 @@ header {
   background: transparent; 
   transition: all 0.2s ease;
 }
-.tab-btn.act-news { background: rgba(200, 16, 46, 0.9); color: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.5); }
-.tab-btn.act-cal { background: rgba(255, 199, 44, 0.95); color: #090d16; box-shadow: 0 2px 6px rgba(0,0,0,0.5); font-weight: 900; }
+.tab-btn.act-news { background: rgba(200, 16, 46, 0.9); color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+.tab-btn.act-cal { background: rgba(255, 199, 44, 0.95); color: #090d16; box-shadow: 0 2px 8px rgba(0,0,0,0.5); font-weight: 900; }
 
 .search-box { margin-top: 10px; }
 .search-input { 
   width: 100%; 
-  background: rgba(9, 13, 22, 0.75); 
-  backdrop-filter: blur(10px); 
+  background: rgba(9, 13, 22, 0.78); 
+  backdrop-filter: blur(12px); 
   border: 1px solid rgba(255,255,255,0.2); 
   color: #fff; 
   padding: 8px 12px; 
@@ -113,23 +145,201 @@ nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width:
 <div id="app">
 <div id="toast"></div>
 
-<!-- HEADER ZONDER LOS STER-ICOON, VOLLEDIGE VLAG-ACHTERGROND -->
+<!-- HEADER MET WAPPERENDE ACHTERGROND -->
 <header>
-  <div class="header-row">
-    <div>
-      <div class="title">Mestreech Vendaog</div>
-      <div class="sub">Nuijts, Callepin & Grensregio</div>
+  <div class="header-flag-img"></div>
+  <div class="header-overlay"></div>
+  <div class="header-content">
+    <div class="header-row">
+      <div>
+        <div class="title">Mestreech Vendaog</div>
+        <div class="sub">Nuijts, Callepin & Grensregio</div>
+      </div>
+      <button onclick="fetchLive()" class="btn-live">● <span id="stTxt">Live feed</span></button>
     </div>
-    <button onclick="fetchLive()" class="btn-live">● <span id="stTxt">Live feed</span></button>
-  </div>
-  <div class="tab-row">
-    <button id="tbN" onclick="setTab('nieuws')" class="tab-btn act-news">📰 Mestreechs Nuijts</button>
-    <button id="tbA" onclick="setTab('agenda')" class="tab-btn">📒 Callepin</button>
-  </div>
-  <div class="search-box">
-    <input type="text" id="q" oninput="doSearch(this.value)" placeholder="Zeuk in nuijts, Wyck, Bieste, 112..." class="search-input">
+    <div class="tab-row">
+      <button id="tbN" onclick="setTab('nieuws')" class="tab-btn act-news">📰 Mestreechs Nuijts</button>
+      <button id="tbA" onclick="setTab('agenda')" class="tab-btn">📒 Callepin</button>
+    </div>
+    <div class="search-box">
+      <input type="text" id="q" oninput="doSearch(this.value)" placeholder="Zoek in nieuws, Wyck, bieste, 112..." class="search-input">
+    </div>
   </div>
 </header>
 
 <div id="newsFeed" class="feed"></div>
-<div id="agendaFeed" class="feed" style="display:none;">
+<div id="agendaFeed" class="feed" style="display:none;"></div>
+
+<div id="viewer">
+  <div class="v-bar">
+    <button onclick="closeV()" class="v-close">✕ Sluiten</button>
+    <span id="vTitle" class="v-title">Bericht</span>
+    <a id="vExt" href="#" target="_blank" class="v-ext">YouTube / Web ↗</a>
+  </div>
+  <iframe id="frame" src="about:blank" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+</div>
+
+<nav>
+  <button id="nbN" onclick="setTab('nieuws'); resetCat()" class="n-btn act"><span>📰</span>Nuijts</button>
+  <button id="nbA" onclick="setTab('agenda')" class="n-btn"><span>📒</span>Callepin</button>
+  <button onclick="catBiest()" class="n-btn" style="color:#2dd4bf;"><span>🐾</span>Bieste</button>
+  <button onclick="cat112()" class="n-btn" style="color:#ef4444;"><span>🚨</span>112</button>
+</nav>
+</div>
+
+<script>
+let news = [];
+
+let agenda = [
+  { id: "c1", title: "Live Jazz op de Markt & Terrassen", loc: "Markt Maastricht", time: "Vandaag 19:30", price: "Gratis", img: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=600&q=80", url: "https://www.bezoekmaastricht.nl/uitagenda", txt: "Terrasconcert met Maastrichtse muzikanten." },
+  { id: "c2", title: "Riemst (BE): Geheimen van Mergelgrotten Kanne", loc: "Kanne (Riemst)", time: "Weekend 20:30", price: "€ 14,-", img: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80", url: "https://www.riemst.be", txt: "Avondrondleiding bij kaarslicht net over de grens." }
+];
+
+let curTab = "nieuws";
+let curCat = "alles";
+let query = "";
+
+function showToast(msg) {
+  let t = document.getElementById("toast");
+  t.textContent = msg;
+  t.style.display = "block";
+  setTimeout(() => { t.style.display = "none"; }, 2500);
+}
+
+async function loadData() {
+  try {
+    let localRes = await fetch('news_data.json?t=' + Date.now());
+    if (localRes.ok) {
+      let data = await localRes.json();
+      if (Array.isArray(data) && data.length > 0) {
+        news = data;
+        renderN();
+        return;
+      }
+    }
+  } catch(e) {}
+}
+
+async function fetchLive() {
+  document.getElementById("stTxt").textContent = "Laden...";
+  try {
+    let res = await fetch("https://raw.githubusercontent.com/guidohaesen/mestreech-vendaog/main/www/news_data.json?t=" + Date.now());
+    if (res.ok) {
+      let d = await res.json();
+      if (Array.isArray(d) && d.length > 0) { 
+        news = d; 
+        renderN(); 
+        document.getElementById("stTxt").textContent = "Live bijgewerkt"; 
+        return; 
+      }
+    }
+  } catch(e) {}
+  document.getElementById("stTxt").textContent = "Live feed";
+}
+
+function handleCardClick(url, title, is112) {
+  if (is112 || !url) {
+    showToast("ℹ️ Volledige details staan al op deze kaart.");
+    return;
+  }
+  openV(url, title);
+}
+
+function renderN() {
+  let el = document.getElementById("newsFeed");
+  let q = query.toLowerCase();
+  let list = news.filter(it => {
+    let catVal = (it.category || it.cat || "").toLowerCase();
+    let mCat = (curCat === "alles") || 
+               (curCat === "bieste" && (catVal.includes("biest") || catVal.includes("dier"))) ||
+               (curCat === "112" && (catVal.includes("112") || it.source.includes("112")));
+    let mQ = !q || it.title.toLowerCase().includes(q) || (it.snippet && it.snippet.toLowerCase().includes(q));
+    return mCat && mQ;
+  });
+
+  if(!list.length) { 
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:#64748b;font-size:12px;">Geen berichten gevonden.</div>'; 
+    return; 
+  }
+
+  el.innerHTML = list.map(it => {
+    let catVal = (it.category || it.cat || "").toLowerCase();
+    let is112 = catVal.includes("112") || (it.source && it.source.includes("112"));
+    let isBiest = catVal.includes("biest") || catVal.includes("dier");
+    let isSter = it.source === "De Nieuwe Ster";
+    let isYt = (it.source && it.source.includes("Video")) || (it.category === "Wat is loos");
+
+    let bCls = is112 ? "badge alert112" : (isBiest ? "badge teal" : (isYt ? "badge yt" : (isSter ? "badge gold" : "badge")));
+    let safeT = (it.title || "").replace(/'/g, "");
+    
+    return `<div class="card" onclick="handleCardClick('${it.url || ""}', '${safeT}', ${is112})">
+      <div class="img-wrap">
+        <img src="${it.image}" loading="lazy">
+        <span class="${bCls}">${it.source}</span>
+        <span class="card-time">🕒 ${it.time}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${it.title}</div>
+        <div class="card-desc">${it.snippet || ""}</div>
+        <div class="card-foot">
+          <span>📍 ${it.locationTag || "Maastricht"}</span>
+          <button class="btn-share" onclick="doShare(event,'${safeT}','${it.url || "112 Maastricht Melding"}')">Delen ➦</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function renderA() {
+  let el = document.getElementById("agendaFeed");
+  let q = query.toLowerCase();
+  let list = agenda.filter(it => !q || it.title.toLowerCase().includes(q) || it.loc.toLowerCase().includes(q));
+  el.innerHTML = list.map(it => {
+    let safeT = (it.title || "").replace(/'/g, "");
+    return `<div class="card" onclick="openV('${it.url}','${safeT}')">
+      <div class="img-wrap"><img src="${it.img}" loading="lazy"><span class="badge gold">${it.price}</span><span class="card-time">🕒 ${it.time}</span></div>
+      <div class="card-body"><div class="card-title">${it.title}</div><div class="card-desc">${it.txt}</div>
+      <div class="card-foot"><span>📍 ${it.loc}</span>
+      <button class="btn-share" onclick="doShare(event,'${safeT}','${it.url}')">Delen ➦</button>
+      </div></div></div>`;
+  }).join("");
+}
+
+function setTab(t) {
+  curTab = t;
+  document.getElementById("newsFeed").style.display = t === "nieuws" ? "flex" : "none";
+  document.getElementById("agendaFeed").style.display = t === "agenda" ? "flex" : "none";
+  document.getElementById("tbN").className = t === "nieuws" ? "tab-btn act-news" : "tab-btn";
+  document.getElementById("tbA").className = t === "agenda" ? "tab-btn act-cal" : "tab-btn";
+  document.getElementById("nbN").className = t === "nieuws" ? "n-btn act" : "n-btn";
+  document.getElementById("nbA").className = t === "agenda" ? "n-btn act-g" : "n-btn";
+  if (t === "nieuws") renderN(); else renderA();
+}
+
+function catBiest() { setTab("nieuws"); curCat = "bieste"; renderN(); }
+function cat112() { setTab("nieuws"); curCat = "112"; renderN(); }
+function resetCat() { curCat = "alles"; renderN(); }
+function doSearch(v) { query = v; if (curTab === "nieuws") renderN(); else renderA(); }
+
+function doShare(e, t, u) {
+  e.stopPropagation();
+  if (navigator.share) navigator.share({ title: t, url: u }).catch(()=>{});
+  else { navigator.clipboard.writeText(t + " " + u); alert("Gekopieerd!"); }
+}
+
+function openV(u, t) {
+  document.getElementById("vTitle").textContent = t;
+  document.getElementById("vExt").href = u;
+  document.getElementById("frame").src = u;
+  document.getElementById("viewer").style.display = "flex";
+}
+
+function closeV() {
+  document.getElementById("viewer").style.display = "none";
+  document.getElementById("frame").src = "about:blank";
+}
+
+loadData();
+</script>
+</body>
+</html>
