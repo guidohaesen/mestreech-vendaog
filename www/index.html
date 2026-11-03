@@ -28,6 +28,7 @@ header { position: sticky; top: 0; z-index: 40; background: #C8102E; border-bott
 .badge { position: absolute; top: 8px; left: 8px; background: #C8102E; color: #fff; font-size: 10px; font-weight: 800; padding: 2px 6px; border-radius: 4px; }
 .badge.gold { background: #FFC72C; color: #000; }
 .badge.teal { background: #0d9488; }
+.badge.alert112 { background: #ef4444; color: #fff; font-weight: 900; }
 .card-time { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: #e2e8f0; font-size: 10px; padding: 2px 6px; border-radius: 4px; }
 .card-body { padding: 10px 12px 12px; }
 .card-title { font-size: 14px; font-weight: 800; color: #fff; margin-bottom: 4px; line-height: 1.3; }
@@ -64,7 +65,7 @@ nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width:
 <button id="tbA" onclick="setTab('agenda')" class="tab-btn">📒 Callepin</button>
 </div>
 <div class="search-box">
-<input type="text" id="q" oninput="doSearch(this.value)" placeholder="Zoek in nieuws, Wyck, dier..." class="search-input">
+<input type="text" id="q" oninput="doSearch(this.value)" placeholder="Zoek in nieuws, Wyck, bieste, 112..." class="search-input">
 </div>
 </header>
 
@@ -83,15 +84,16 @@ nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width:
 <nav>
 <button id="nbN" onclick="setTab('nieuws'); resetCat()" class="n-btn act"><span>📰</span>Nuijts</button>
 <button id="nbA" onclick="setTab('agenda')" class="n-btn"><span>📒</span>Callepin</button>
-<button onclick="catAnimal()" class="n-btn" style="color:#2dd4bf;"><span>🐾</span>Diere</button>
-<button onclick="openV('https://www.stadindex.nl/112/maastricht','🚨 112 Maastricht')" class="n-btn" style="color:#ef4444;"><span>🚨</span>112</button>
+<button onclick="catAnimal()" class="n-btn" style="color:#2dd4bf;"><span>🐾</span>Bieste</button>
+<button onclick="cat112()" class="n-btn" style="color:#ef4444;"><span>🚨</span>112</button>
 </nav>
 </div>
 
 <script>
 let news = [
-{ id: "a1", title: "🐾 Dierenbescherming: Vermiste dieren regio Maastricht", src: "Mijn Dier Is Zoek", cat: "dier", time: "Actueel", img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80", url: "https://mijndieriszoek.dierenbescherming.nl/vermiste-dieren/honden?location=Maastricht", loc: "Maastricht e.o.", txt: "Overzicht van vermiste en gevonden honden en katten in Maastricht." },
-{ id: "a2", title: "Wat is loos: Kettingbotsing met drie wagens op A2 richting Eindhoven", src: "Wat is loos", cat: "loos", time: "Recent", img: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=600&q=80", url: "https://watisloos.nl/", loc: "A2 Maastricht", txt: "Snelweg tijdelijk dicht na aanrijding tussen meerdere voertuigen." },
+{ id: "112-init", title: "🚨 112: Aanrijding met letsel op Noorderbrug Maastricht", src: "112 Maastricht", cat: "112", time: "Recent", img: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80", url: "https://p2000.net/limburg/maastricht", loc: "Noorderbrug", txt: "Politie en ambulance met spoed gealarmeerd via P2000 meldkamer." },
+{ id: "a1", title: "🐾 Dierenbescherming: Vermiste & gevonden bieste regio Maastricht", src: "Mijn Dier Is Zoek", cat: "bieste", time: "Actueel", img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80", url: "https://mijndieriszoek.dierenbescherming.nl/vermiste-dieren/honden?location=Maastricht", loc: "Maastricht e.o.", txt: "Overzicht van vermiste en gevonden honden en katten in Maastricht." },
+{ id: "a2", title: "Wat is loos: Kettingbotsing met drie wagens op A2 richting Eindhoven", src: "Wat is loos in Mestreech", cat: "loos", time: "Recent", img: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=600&q=80", url: "https://watisloos.nl/", loc: "A2 Maastricht", txt: "Snelweg tijdelijk dicht na aanrijding tussen meerdere voertuigen." },
 { id: "a3", title: "De Nieuwe Ster: Ondernemers Wyck bezorgd over bereikbaarheid", src: "De Nieuwe Ster", cat: "ster", time: "Vandaag", img: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80", url: "https://www.denieuwestermaastricht.nl/", loc: "Wyck", txt: "Winkeliers en horeca in de Rechtstraat trekken aan de bel." }
 ];
 
@@ -105,86 +107,113 @@ let curCat = "alles";
 let query = "";
 
 async function fetchLive() {
-document.getElementById("stTxt").textContent = "Laden...";
-try {
-let res = await fetch("https://raw.githubusercontent.com/guidohaesen/mestreech-vendaog/main/www/news_data.json?t=" + Date.now());
-if (res.ok) {
-let d = await res.json();
-if (Array.isArray(d) && d.length > 0) { news = d; renderN(); document.getElementById("stTxt").textContent = "Live bijgewerkt"; return; }
-}
-} catch(e) {}
-document.getElementById("stTxt").textContent = "Live feed";
+  document.getElementById("stTxt").textContent = "Laden...";
+  try {
+    let res = await fetch("https://raw.githubusercontent.com/guidohaesen/mestreech-vendaog/main/www/news_data.json?t=" + Date.now());
+    if (res.ok) {
+      let d = await res.json();
+      if (Array.isArray(d) && d.length > 0) { 
+        news = d; 
+        renderN(); 
+        document.getElementById("stTxt").textContent = "Live bijgewerkt"; 
+        return; 
+      }
+    }
+  } catch(e) {}
+  document.getElementById("stTxt").textContent = "Live feed";
 }
 
 function renderN() {
-let el = document.getElementById("newsFeed");
-let q = query.toLowerCase();
-let list = news.filter(it => {
-let mCat = (curCat === "alles") || (curCat === "dier" && (it.cat === "dier" || it.category === "Vermist dier"));
-let mQ = !q || it.title.toLowerCase().includes(q) || (it.txt && it.txt.toLowerCase().includes(q)) || (it.snippet && it.snippet.toLowerCase().includes(q));
-return mCat && mQ;
-});
+  let el = document.getElementById("newsFeed");
+  let q = query.toLowerCase();
+  let list = news.filter(it => {
+    let catVal = (it.cat || it.category || "").toLowerCase();
+    let mCat = (curCat === "alles") || 
+               (curCat === "bieste" && (catVal.includes("biest") || catVal.includes("dier"))) ||
+               (curCat === "112" && catVal.includes("112"));
+    let mQ = !q || it.title.toLowerCase().includes(q) || (it.txt && it.txt.toLowerCase().includes(q)) || (it.snippet && it.snippet.toLowerCase().includes(q));
+    return mCat && mQ;
+  });
 
-if(!list.length) { el.innerHTML = '<div style="text-align:center;padding:30px;color:#64748b;font-size:12px;">Geen berichten gevonden.</div>'; return; }
+  if(!list.length) { 
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:#64748b;font-size:12px;">Geen berichten gevonden.</div>'; 
+    return; 
+  }
 
-el.innerHTML = list.map(it => {
-let bCls = it.src === "De Nieuwe Ster" ? "badge gold" : (it.cat === "dier" || it.category === "Vermist dier" ? "badge teal" : "badge");
-let safeT = (it.title || "").replace(/'/g, "");
-return `<div class="card" onclick="openV('${it.url}','${safeT}')">
-<div class="img-wrap"><img src="${it.img || it.image}" loading="lazy"><span class="${bCls}">${it.src || it.source}</span><span class="card-time">🕒 ${it.time}</span></div>
-<div class="card-body"><div class="card-title">${it.title}</div><div class="card-desc">${it.txt || it.snippet || ""}</div>
-<div class="card-foot"><span>📍 ${it.loc || it.locationTag || "Maastricht"}</span>
-<button class="btn-share" onclick="doShare(event,'${safeT}','${it.url}')">Delen ➦</button>
-</div></div></div>`;
-}).join("");
+  el.innerHTML = list.map(it => {
+    let catVal = (it.cat || it.category || "").toLowerCase();
+    let is112 = catVal.includes("112") || (it.source && it.source.includes("112"));
+    let isBieste = catVal.includes("biest") || catVal.includes("dier");
+    let isSter = (it.src || it.source) === "De Nieuwe Ster";
+
+    let bCls = is112 ? "badge alert112" : (isBieste ? "badge teal" : (isSter ? "badge gold" : "badge"));
+    let safeT = (it.title || "").replace(/'/g, "");
+    
+    return `<div class="card" onclick="openV('${it.url}','${safeT}')">
+      <div class="img-wrap">
+        <img src="${it.img || it.image}" loading="lazy">
+        <span class="${bCls}">${it.src || it.source}</span>
+        <span class="card-time">🕒 ${it.time}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${it.title}</div>
+        <div class="card-desc">${it.txt || it.snippet || ""}</div>
+        <div class="card-foot">
+          <span>📍 ${it.loc || it.locationTag || "Maastricht"}</span>
+          <button class="btn-share" onclick="doShare(event,'${safeT}','${it.url}')">Delen ➦</button>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
 }
 
 function renderA() {
-let el = document.getElementById("agendaFeed");
-let q = query.toLowerCase();
-let list = agenda.filter(it => !q || it.title.toLowerCase().includes(q) || it.loc.toLowerCase().includes(q));
-el.innerHTML = list.map(it => {
-let safeT = (it.title || "").replace(/'/g, "");
-return `<div class="card" onclick="openV('${it.url}','${safeT}')">
-<div class="img-wrap"><img src="${it.img}" loading="lazy"><span class="badge gold">${it.price}</span><span class="card-time">🕒 ${it.time}</span></div>
-<div class="card-body"><div class="card-title">${it.title}</div><div class="card-desc">${it.txt}</div>
-<div class="card-foot"><span>📍 ${it.loc}</span>
-<button class="btn-share" onclick="doShare(event,'${safeT}','${it.url}')">Delen ➦</button>
-</div></div></div>`;
-}).join("");
+  let el = document.getElementById("agendaFeed");
+  let q = query.toLowerCase();
+  let list = agenda.filter(it => !q || it.title.toLowerCase().includes(q) || it.loc.toLowerCase().includes(q));
+  el.innerHTML = list.map(it => {
+    let safeT = (it.title || "").replace(/'/g, "");
+    return `<div class="card" onclick="openV('${it.url}','${safeT}')">
+      <div class="img-wrap"><img src="${it.img}" loading="lazy"><span class="badge gold">${it.price}</span><span class="card-time">🕒 ${it.time}</span></div>
+      <div class="card-body"><div class="card-title">${it.title}</div><div class="card-desc">${it.txt}</div>
+      <div class="card-foot"><span>📍 ${it.loc}</span>
+      <button class="btn-share" onclick="doShare(event,'${safeT}','${it.url}')">Delen ➦</button>
+      </div></div></div>`;
+  }).join("");
 }
 
 function setTab(t) {
-curTab = t;
-document.getElementById("newsFeed").style.display = t === "nieuws" ? "flex" : "none";
-document.getElementById("agendaFeed").style.display = t === "agenda" ? "flex" : "none";
-document.getElementById("tbN").className = t === "nieuws" ? "tab-btn act-news" : "tab-btn";
-document.getElementById("tbA").className = t === "agenda" ? "tab-btn act-cal" : "tab-btn";
-document.getElementById("nbN").className = t === "nieuws" ? "n-btn act" : "n-btn";
-document.getElementById("nbA").className = t === "agenda" ? "n-btn act-g" : "n-btn";
-if (t === "nieuws") renderN(); else renderA();
+  curTab = t;
+  document.getElementById("newsFeed").style.display = t === "nieuws" ? "flex" : "none";
+  document.getElementById("agendaFeed").style.display = t === "agenda" ? "flex" : "none";
+  document.getElementById("tbN").className = t === "nieuws" ? "tab-btn act-news" : "tab-btn";
+  document.getElementById("tbA").className = t === "agenda" ? "tab-btn act-cal" : "tab-btn";
+  document.getElementById("nbN").className = t === "nieuws" ? "n-btn act" : "n-btn";
+  document.getElementById("nbA").className = t === "agenda" ? "n-btn act-g" : "n-btn";
+  if (t === "nieuws") renderN(); else renderA();
 }
 
-function catAnimal() { setTab("nieuws"); curCat = "dier"; renderN(); }
+function catAnimal() { setTab("nieuws"); curCat = "bieste"; renderN(); }
+function cat112() { setTab("nieuws"); curCat = "112"; renderN(); }
 function resetCat() { curCat = "alles"; renderN(); }
 function doSearch(v) { query = v; if (curTab === "nieuws") renderN(); else renderA(); }
 
 function doShare(e, t, u) {
-e.stopPropagation();
-if (navigator.share) navigator.share({ title: t, url: u }).catch(()=>{});
-else { navigator.clipboard.writeText(t + " " + u); alert("Link gekopieerd!"); }
+  e.stopPropagation();
+  if (navigator.share) navigator.share({ title: t, url: u }).catch(()=>{});
+  else { navigator.clipboard.writeText(t + " " + u); alert("Link gekopieerd!"); }
 }
 
 function openV(u, t) {
-document.getElementById("vTitle").textContent = t;
-document.getElementById("vExt").href = u;
-document.getElementById("frame").src = u;
-document.getElementById("viewer").style.display = "flex";
+  document.getElementById("vTitle").textContent = t;
+  document.getElementById("vExt").href = u;
+  document.getElementById("frame").src = u;
+  document.getElementById("viewer").style.display = "flex";
 }
 
 function closeV() {
-document.getElementById("viewer").style.display = "none";
-document.getElementById("frame").src = "about:blank";
+  document.getElementById("viewer").style.display = "none";
+  document.getElementById("frame").src = "about:blank";
 }
 
 renderN();
