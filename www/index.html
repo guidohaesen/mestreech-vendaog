@@ -84,27 +84,46 @@ nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width:
 <nav>
 <button id="nbN" onclick="setTab('nieuws'); resetCat()" class="n-btn act"><span>📰</span>Nuijts</button>
 <button id="nbA" onclick="setTab('agenda')" class="n-btn"><span>📒</span>Callepin</button>
-<button onclick="catAnimal()" class="n-btn" style="color:#2dd4bf;"><span>🐾</span>Bieste</button>
+<button onclick="catBiest()" class="n-btn" style="color:#2dd4bf;"><span>🐾</span>Bieste</button>
 <button onclick="cat112()" class="n-btn" style="color:#ef4444;"><span>🚨</span>112</button>
 </nav>
 </div>
 
 <script>
-let news = [
-{ id: "112-init", title: "🚨 112: Aanrijding met letsel op Noorderbrug Maastricht", src: "112 Maastricht", cat: "112", time: "Recent", img: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80", url: "https://p2000.net/limburg/maastricht", loc: "Noorderbrug", txt: "Politie en ambulance met spoed gealarmeerd via P2000 meldkamer." },
-{ id: "a1", title: "🐾 Dierenbescherming: Vermiste & gevonden bieste regio Maastricht", src: "Mijn Dier Is Zoek", cat: "bieste", time: "Actueel", img: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80", url: "https://mijndieriszoek.dierenbescherming.nl/vermiste-dieren/honden?location=Maastricht", loc: "Maastricht e.o.", txt: "Overzicht van vermiste en gevonden honden en katten in Maastricht." },
-{ id: "a2", title: "Wat is loos: Kettingbotsing met drie wagens op A2 richting Eindhoven", src: "Wat is loos in Mestreech", cat: "loos", time: "Recent", img: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=600&q=80", url: "https://watisloos.nl/", loc: "A2 Maastricht", txt: "Snelweg tijdelijk dicht na aanrijding tussen meerdere voertuigen." },
-{ id: "a3", title: "De Nieuwe Ster: Ondernemers Wyck bezorgd over bereikbaarheid", src: "De Nieuwe Ster", cat: "ster", time: "Vandaag", img: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80", url: "https://www.denieuwestermaastricht.nl/", loc: "Wyck", txt: "Winkeliers en horeca in de Rechtstraat trekken aan de bel." }
+let news = [];
+
+const fallbackNews = [
+  { id: "112-1", title: "🚨 112: Aanrijding letsel Sibemaweg Maastricht", source: "112 Maastricht", category: "112", time: "Recent", image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=600&q=80", url: "https://alarmeringen.nl/limburg/limburg-zuid/maastricht/", locationTag: "Sibemaweg", snippet: "Politie en ambulance met spoed gealarmeerd voor verkeersongeval op de Sibemaweg." },
+  { id: "biest-1", title: "🐾 Dierenbescherming: Vermiste & gevonden bieste regio Maastricht", source: "Mijn Dier Is Zoek", category: "bieste", time: "Live overzicht", image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=600&q=80", url: "https://mijndieriszoek.dierenbescherming.nl/vermiste-dieren/honden?location=Maastricht", locationTag: "Maastricht e.o.", snippet: "Actuele meldingen van vermiste en gevonden bieste in Maastricht e.o." },
+  { id: "loos-1", title: "Wat is loos: Kettingbotsing met drie voertuigen op A2", source: "Wat is loos", category: "Wat is loos", time: "Recent", image: "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=600&q=80", url: "https://watisloos.nl/", locationTag: "A2 Maastricht", snippet: "Snelweg tijdelijk afgesloten na aanrijding tussen meerdere voertuigen." },
+  { id: "ster-1", title: "De Nieuwe Ster: GEN Z - 12 jongeren kregen bevel verwijdering", source: "De Nieuwe Ster", category: "De Nieuwe Ster", time: "Vandaag", image: "https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80", url: "https://www.denieuwestermaastricht.nl/", locationTag: "Centrum", snippet: "Politie trad op in het centrum van de stad." }
 ];
 
 let agenda = [
-{ id: "c1", title: "Live Jazz op de Markt & Jekerterras", loc: "Markt Maastricht", time: "Vandaag 19:30", price: "Gratis", img: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=600&q=80", url: "https://www.bezoekmaastricht.nl/uitagenda", txt: "Terrasconcert met Maastrichtse jazzmuzikanten." },
-{ id: "c2", title: "Riemst (BE): Geheimen van Mergelgrotten Kanne", loc: "Kanne (Riemst)", time: "Weekend 20:30", price: "€ 14,-", img: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80", url: "https://www.riemst.be", txt: "Avondrondleiding bij kaarslicht net over de grens." }
+  { id: "c1", title: "Live Jazz op de Markt & Terrassen", loc: "Markt Maastricht", time: "Vandaag 19:30", price: "Gratis", img: "https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=600&q=80", url: "https://www.bezoekmaastricht.nl/uitagenda", txt: "Terrasconcert met Maastrichtse muzikanten." },
+  { id: "c2", title: "Riemst (BE): Geheimen van Mergelgrotten Kanne", loc: "Kanne (Riemst)", time: "Weekend 20:30", price: "€ 14,-", img: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=600&q=80", url: "https://www.riemst.be", txt: "Avondrondleiding bij kaarslicht net over de grens." }
 ];
 
 let curTab = "nieuws";
 let curCat = "alles";
 let query = "";
+
+async function loadData() {
+  try {
+    let localRes = await fetch('news_data.json?t=' + Date.now());
+    if (localRes.ok) {
+      let data = await localRes.json();
+      if (Array.isArray(data) && data.length > 0) {
+        news = data;
+        renderN();
+        return;
+      }
+    }
+  } catch(e) {}
+  
+  news = fallbackNews;
+  renderN();
+}
 
 async function fetchLive() {
   document.getElementById("stTxt").textContent = "Laden...";
@@ -127,11 +146,11 @@ function renderN() {
   let el = document.getElementById("newsFeed");
   let q = query.toLowerCase();
   let list = news.filter(it => {
-    let catVal = (it.cat || it.category || "").toLowerCase();
+    let catVal = (it.category || it.cat || "").toLowerCase();
     let mCat = (curCat === "alles") || 
                (curCat === "bieste" && (catVal.includes("biest") || catVal.includes("dier"))) ||
-               (curCat === "112" && catVal.includes("112"));
-    let mQ = !q || it.title.toLowerCase().includes(q) || (it.txt && it.txt.toLowerCase().includes(q)) || (it.snippet && it.snippet.toLowerCase().includes(q));
+               (curCat === "112" && (catVal.includes("112") || it.source.includes("112")));
+    let mQ = !q || it.title.toLowerCase().includes(q) || (it.snippet && it.snippet.toLowerCase().includes(q));
     return mCat && mQ;
   });
 
@@ -141,25 +160,25 @@ function renderN() {
   }
 
   el.innerHTML = list.map(it => {
-    let catVal = (it.cat || it.category || "").toLowerCase();
-    let is112 = catVal.includes("112") || (it.source && it.source.includes("112"));
-    let isBieste = catVal.includes("biest") || catVal.includes("dier");
-    let isSter = (it.src || it.source) === "De Nieuwe Ster";
+    let catVal = (it.category || it.cat || "").toLowerCase();
+    let is112 = catVal.includes("112") || it.source.includes("112");
+    let isBiest = catVal.includes("biest") || catVal.includes("dier");
+    let isSter = it.source === "De Nieuwe Ster";
 
-    let bCls = is112 ? "badge alert112" : (isBieste ? "badge teal" : (isSter ? "badge gold" : "badge"));
+    let bCls = is112 ? "badge alert112" : (isBiest ? "badge teal" : (isSter ? "badge gold" : "badge"));
     let safeT = (it.title || "").replace(/'/g, "");
     
     return `<div class="card" onclick="openV('${it.url}','${safeT}')">
       <div class="img-wrap">
-        <img src="${it.img || it.image}" loading="lazy">
-        <span class="${bCls}">${it.src || it.source}</span>
+        <img src="${it.image}" loading="lazy">
+        <span class="${bCls}">${it.source}</span>
         <span class="card-time">🕒 ${it.time}</span>
       </div>
       <div class="card-body">
         <div class="card-title">${it.title}</div>
-        <div class="card-desc">${it.txt || it.snippet || ""}</div>
+        <div class="card-desc">${it.snippet || ""}</div>
         <div class="card-foot">
-          <span>📍 ${it.loc || it.locationTag || "Maastricht"}</span>
+          <span>📍 ${it.locationTag || "Maastricht"}</span>
           <button class="btn-share" onclick="doShare(event,'${safeT}','${it.url}')">Delen ➦</button>
         </div>
       </div>
@@ -193,7 +212,7 @@ function setTab(t) {
   if (t === "nieuws") renderN(); else renderA();
 }
 
-function catAnimal() { setTab("nieuws"); curCat = "bieste"; renderN(); }
+function catBiest() { setTab("nieuws"); curCat = "bieste"; renderN(); }
 function cat112() { setTab("nieuws"); curCat = "112"; renderN(); }
 function resetCat() { curCat = "alles"; renderN(); }
 function doSearch(v) { query = v; if (curTab === "nieuws") renderN(); else renderA(); }
@@ -216,8 +235,7 @@ function closeV() {
   document.getElementById("frame").src = "about:blank";
 }
 
-renderN();
-fetchLive();
+loadData();
 </script>
 </body>
 </html>
